@@ -3,217 +3,231 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vedúci grantového tímu — Smatana</title>
+<title>Vedúci grantového tímu - Smatana</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://unpkg.com/lenis@1.1.14/dist/lenis.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
 :root{
-  --eu-blue:#003399; --eu-blue-deep:#001a4d; --eu-blue-mid:#002a7a; --eu-blue-light:#1a4cb3; --eu-blue-soft:#6CB4E4;
-  --ec-blue:#004494; --eu-gold:#FFCC00; --eu-gold-warm:#f5b800; --eu-gold-soft:#fce69a;
-  --ep-red:#BE3026; --eu-teal:#2D7A89;
-  --paper:#fff; --paper-soft:#f7f5f0; --paper-line:#e8e4d8;
-  --ink:#0e1320; --ink-soft:#2b3142; --ink-mute:#5a6075;
-  --line:rgba(255,204,0,.18); --line-soft:rgba(255,204,0,.08);
-  --ease-out:cubic-bezier(.22,1,.36,1);
+  --cream:#f6f4ee; --paper:#ffffff; --ink:#0a0a0a;
+  --c-orange:#ff6632; --c-peach:#ff9a6e; --c-orange2:#ff6b01;
+  --c-blue:#7d95ff; --c-green:#5abc88; --c-yellow:#e2dc00;
+  --c-pink:#fc98b2; --c-pinklight:#f8b8d0;
+  --c-purple:#673ab7; --c-purpledeep:#2a1b36;
+  --bg-lightgray:#f4f5f7; --bg-gray:#d6d6d6; --bg-beige:#e5cac7; --bg-lightblue:#e0e5f2;
+  --ease-out:cubic-bezier(.2,.8,.2,1);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:auto}
-html,body{background:var(--eu-blue-deep);color:var(--paper);font-family:'Inter',sans-serif;font-size:16px;line-height:1.65;overflow-x:hidden;cursor:none}
-body{min-height:100vh;position:relative}
-::selection{background:var(--eu-gold);color:var(--eu-blue-deep)}
+html,body{background:var(--cream);color:var(--ink);font-family:'Inter',system-ui,sans-serif;font-size:17px;line-height:1.55;overflow-x:hidden;cursor:none;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;position:relative;transition:background-color .6s var(--ease-out)}
+@media(hover:none){body{cursor:auto}}
+::selection{background:var(--c-orange);color:#fff}
 
-#shaderBg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.45}
-#starsBg{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.16;display:flex;align-items:center;justify-content:center}
-#starsBg svg{width:110vh;height:110vh;max-width:110vw;animation:starsRotate 240s linear infinite}
-@keyframes starsRotate{to{transform:rotate(360deg)}}
-.grain{position:fixed;inset:0;z-index:90;pointer-events:none;opacity:.04;mix-blend-mode:overlay}
-.hex-grid{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.05}
+/* CURSOR - compactino style */
+.cursor,.cursor-dot{position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);will-change:transform}
+.cursor{width:38px;height:38px;border:1.5px solid #fff;border-radius:50%;mix-blend-mode:difference;transition:width .4s var(--ease-out),height .4s var(--ease-out)}
+.cursor.is-hover{width:70px;height:70px}
+.cursor-dot{width:5px;height:5px;background:#fff;border-radius:50%;mix-blend-mode:difference}
+@media(hover:none){.cursor,.cursor-dot{display:none}}
 
-.cursor-dot,.cursor-ring{position:fixed;pointer-events:none;z-index:9999;top:0;left:0;border-radius:50%;transform:translate(-50%,-50%)}
-.cursor-dot{width:6px;height:6px;background:var(--eu-gold)}
-.cursor-ring{width:36px;height:36px;border:1px solid var(--eu-gold);transition:width .3s var(--ease-out),height .3s var(--ease-out);mix-blend-mode:difference}
-.cursor-ring.is-hover{width:64px;height:64px;background:rgba(255,204,0,.12)}
-@media(hover:none){.cursor-dot,.cursor-ring{display:none!important}body{cursor:auto}}
+/* SCROLL PROGRESS - rainbow */
+.scroll-progress{position:fixed;top:0;left:0;width:0%;height:3px;background:linear-gradient(90deg,#e2dc00,#5abc88,#ff6632,#ff9a6e,#f8b8d0,#7d95ff);z-index:1000;transition:width .15s linear}
 
-.top-chrome{position:fixed;top:0;left:0;right:0;z-index:100;backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);background:linear-gradient(to bottom,rgba(0,26,77,.95),rgba(0,26,77,.82));border-bottom:1px solid var(--line)}
-.top-nav{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 2.5rem;gap:2rem}
-.brand{display:flex;align-items:center;gap:.95rem;color:var(--paper);text-decoration:none;transition:opacity .3s}
-.brand:hover{opacity:.85}
+/* TOP NAV - light theme */
+.top-chrome{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(246,244,238,.92);backdrop-filter:blur(14px) saturate(160%);-webkit-backdrop-filter:blur(14px) saturate(160%);border-bottom:2px solid var(--ink)}
+.top-nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2.5rem;gap:2rem}
+.brand{display:flex;align-items:center;gap:.95rem;color:var(--ink);text-decoration:none;border-bottom:0;transition:transform .3s}
+.brand:hover{transform:translateX(-2px) rotate(-1deg)}
 .brand-text{display:flex;flex-direction:column;line-height:1}
-.brand-text .a{font-family:'Space Grotesk',sans-serif;font-size:1.18rem;font-weight:600;letter-spacing:.01em}
-.brand-text .b{font-size:.65rem;font-family:'JetBrains Mono',monospace;color:var(--eu-gold-soft);letter-spacing:.22em;text-transform:uppercase;margin-top:.32rem}
+.brand-text .a{font-family:'Space Grotesk',sans-serif;font-size:1.45rem;font-weight:700;letter-spacing:-.01em;text-transform:lowercase}
+.brand-text .b{font-size:.7rem;font-family:'JetBrains Mono',monospace;color:var(--c-orange);letter-spacing:.2em;text-transform:uppercase;margin-top:.4rem;font-weight:500}
 
-.nav-tabs{display:flex;align-items:center;gap:.4rem;list-style:none}
+.nav-tabs{display:flex;align-items:center;gap:.2rem;list-style:none}
 .nav-tab-wrap{position:relative}
-.nav-tab{position:relative;padding:.85rem 1.3rem;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:600;color:rgba(255,255,255,.78);cursor:none;background:transparent;border:none;letter-spacing:.02em;transition:color .3s var(--ease-out)}
-.nav-tab::after{content:'';position:absolute;left:1.3rem;right:1.3rem;bottom:.45rem;height:2px;background:var(--eu-gold);transform:scaleX(0);transform-origin:left;transition:transform .4s var(--ease-out)}
-.nav-tab:hover{color:var(--paper)}
-.nav-tab.is-active{color:var(--eu-gold)}
-.nav-tab.is-active::after{transform:scaleX(1)}
+.nav-tab{padding:.85rem 1.2rem;font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:700;color:var(--ink);cursor:none;background:transparent;border:0;text-transform:lowercase;letter-spacing:-.005em;transition:transform .3s var(--ease-out),color .3s}
+.nav-tab:hover{color:var(--c-orange);transform:translateY(-2px) rotate(-1deg)}
+.nav-tab.is-active{color:var(--c-orange)}
 
-.nav-dropdown{position:absolute;top:100%;left:0;min-width:280px;background:rgba(0,26,77,.98);backdrop-filter:blur(20px);border:1px solid var(--line);border-radius:6px;box-shadow:0 20px 50px rgba(0,0,0,.4);padding:.6rem 0;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .25s var(--ease-out),transform .25s var(--ease-out);z-index:200}
+.nav-dropdown{position:absolute;top:100%;left:0;min-width:280px;background:var(--paper);border:2px solid var(--ink);border-radius:18px;box-shadow:6px 6px 0 var(--ink);padding:.5rem 0;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .25s,transform .25s;z-index:200;margin-top:10px}
 .nav-tab-wrap:hover .nav-dropdown,.nav-tab-wrap.is-open .nav-dropdown{opacity:1;transform:translateY(0);pointer-events:auto}
-.nav-dropdown::before{content:'';position:absolute;top:-8px;left:0;right:0;height:8px}
-.dropdown-item{display:block;width:100%;text-align:left;padding:.7rem 1.3rem;font-family:'Inter',sans-serif;font-size:.9rem;font-weight:500;color:rgba(255,255,255,.78);background:transparent;border:none;cursor:none;border-left:2px solid transparent;transition:all .2s;letter-spacing:.005em}
-.dropdown-item:hover{color:var(--eu-gold);background:rgba(255,204,0,.06);border-left-color:var(--eu-gold)}
-.dropdown-item.is-active{color:var(--eu-gold);border-left-color:var(--eu-gold)}
+.nav-dropdown::before{content:'';position:absolute;top:-12px;left:0;right:0;height:12px}
+.dropdown-item{display:block;width:100%;text-align:left;padding:.75rem 1.3rem;font-family:'Inter',sans-serif;font-size:.95rem;font-weight:500;color:var(--ink);background:transparent;border:0;cursor:none;border-left:3px solid transparent;transition:all .2s;text-transform:lowercase}
+.dropdown-item:hover{color:var(--c-orange);background:var(--cream);border-left-color:var(--c-orange)}
+.dropdown-item.is-active{color:var(--c-orange);border-left-color:var(--c-orange);font-weight:700}
 
 .stage{position:relative;z-index:5;padding-top:84px;min-height:100vh}
-.page{display:none;padding:4rem 2.5rem 8rem;max-width:1240px;margin:0 auto;opacity:0}
+
+/* PAGE - each has its own bg + accent via inline style */
+.page{display:none;padding:10vh 7vw 14vh;background:var(--bg,var(--cream));color:var(--text,var(--ink));min-height:calc(100vh - 84px);opacity:0;transition:background-color .6s var(--ease-out)}
 .page.is-active{display:block}
+.page-inner{max-width:1280px;margin:0 auto}
 
-.kicker{display:inline-flex;align-items:center;gap:.7rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--eu-gold);letter-spacing:.28em;text-transform:uppercase;margin-bottom:1.4rem}
-.kicker::before{content:'';width:32px;height:1px;background:var(--eu-gold)}
-.kicker .num{color:var(--eu-blue-soft)}
+/* KICKER */
+.kicker{display:inline-flex;align-items:center;gap:.7rem;font-family:'JetBrains Mono',monospace;font-size:.74rem;color:var(--accent,var(--c-orange));letter-spacing:.28em;text-transform:uppercase;margin-bottom:3vh;font-weight:600}
+.kicker::before{content:'';width:40px;height:3px;background:var(--accent,var(--c-orange))}
+.kicker .num{color:var(--text,var(--ink));opacity:.5;font-weight:500}
 
-h1.page-title{font-family:'Space Grotesk',sans-serif;font-size:clamp(2.2rem,5.2vw,4rem);font-weight:600;line-height:1.05;letter-spacing:-.025em;color:var(--paper);margin-bottom:1.5rem}
-h1.page-title em{font-style:normal;font-weight:700;color:var(--eu-gold)}
-.lede{font-family:'Inter',sans-serif;font-size:clamp(1.05rem,1.4vw,1.2rem);line-height:1.55;color:rgba(255,255,255,.85);max-width:760px;margin-bottom:2.5rem;font-weight:300}
-h2{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.45rem,2.2vw,1.95rem);font-weight:500;line-height:1.2;letter-spacing:-.01em;color:var(--paper);margin:3rem 0 1rem}
-h3{font-family:'Space Grotesk',sans-serif;font-size:1.08rem;font-weight:600;color:var(--eu-gold);margin:2rem 0 .6rem;letter-spacing:.005em}
-p,li{color:rgba(255,255,255,.82);font-weight:300}
-p{margin-bottom:1.2rem;max-width:78ch}
-p strong,li strong{color:var(--paper);font-weight:600}
-p em,li em{font-style:normal;font-weight:600;color:var(--eu-gold)}
-a{color:var(--eu-gold-soft);text-decoration:none;border-bottom:1px solid rgba(255,204,0,.32);transition:color .2s,border-color .2s}
-a:hover{color:var(--eu-gold);border-bottom-color:var(--eu-gold)}
+/* DISPLAY HEADINGS - HUGE, lowercase, accent color */
+h1.page-title{font-family:'Space Grotesk',sans-serif;font-size:clamp(48px,9vw,140px);font-weight:700;line-height:.98;letter-spacing:-.035em;text-transform:lowercase;color:var(--accent,var(--c-orange));margin:0 0 6vh}
+h1.page-title em{font-style:normal;font-weight:700;color:var(--text,var(--ink))}
+.lede{font-family:'Inter',sans-serif;font-size:clamp(20px,1.7vw,28px);line-height:1.4;color:var(--text,var(--ink));max-width:32ch;margin-bottom:5vh;font-weight:500;letter-spacing:-.005em}
+h2{font-family:'Space Grotesk',sans-serif;font-size:clamp(30px,4vw,56px);font-weight:700;line-height:1.0;letter-spacing:-.025em;text-transform:lowercase;color:var(--accent,var(--c-orange));margin:8vh 0 2.5vh}
+h3{font-family:'Space Grotesk',sans-serif;font-size:clamp(20px,1.7vw,26px);font-weight:700;color:var(--text,var(--ink));margin:3vh 0 1vh;letter-spacing:-.01em}
+p,li{color:var(--text,var(--ink));font-weight:400}
+p{margin-bottom:1.4rem;max-width:78ch;font-size:clamp(16px,1.2vw,19px);line-height:1.6}
+p strong,li strong{font-weight:700;color:var(--accent,var(--c-orange))}
+p em,li em{font-style:normal;font-weight:600;color:var(--accent,var(--c-orange))}
+a{color:var(--accent,var(--c-orange));text-decoration:none;border-bottom:1.5px solid currentColor;transition:opacity .2s}
+a:hover{opacity:.65}
 
-ul.bullet,ol.bullet{list-style:none;margin:1.2rem 0;max-width:80ch}
-ul.bullet li,ol.bullet li{position:relative;padding:.55rem 0 .55rem 2.2rem;color:rgba(255,255,255,.82);font-weight:300;line-height:1.6}
-ul.bullet li+li,ol.bullet li+li{border-top:1px solid var(--line-soft)}
-ul.bullet li::before{content:'';position:absolute;left:.4rem;top:1.05rem;width:8px;height:1.5px;background:var(--eu-gold)}
+/* BULLETS */
+ul.bullet,ol.bullet{list-style:none;margin:2.5vh 0;max-width:80ch}
+ul.bullet li,ol.bullet li{position:relative;padding:1.2rem 0 1.2rem 2.6rem;font-size:clamp(15px,1.1vw,18px);line-height:1.55;border-top:1.5px solid currentColor;color:var(--text,var(--ink))}
+ul.bullet li{border-top-color:rgba(10,10,10,.12)}
+ol.bullet li{border-top-color:rgba(10,10,10,.12)}
+ul.bullet li:last-child,ol.bullet li:last-child{border-bottom:1.5px solid rgba(10,10,10,.12)}
+ul.bullet li::before{content:'';position:absolute;left:.4rem;top:1.85rem;width:16px;height:3.5px;background:var(--accent,var(--c-orange));border-radius:2px}
 ol.bullet{counter-reset:oitem}
-ol.bullet li{counter-increment:oitem;padding-left:2.6rem}
-ol.bullet li::before{content:counter(oitem,decimal-leading-zero);position:absolute;left:0;top:.7rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--eu-gold);letter-spacing:.08em}
+ol.bullet li{counter-increment:oitem;padding-left:3.2rem}
+ol.bullet li::before{content:counter(oitem,decimal-leading-zero);position:absolute;left:0;top:1.25rem;font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--accent,var(--c-orange));letter-spacing:.08em;font-weight:600}
 
-.paper{background:var(--paper);color:var(--ink);border-radius:6px;padding:2.4rem;margin:2rem 0;box-shadow:0 14px 50px rgba(0,0,0,.32);position:relative}
-.paper.bordered::before{content:'';position:absolute;inset:10px;border:1px solid var(--paper-line);pointer-events:none;border-radius:3px}
-.paper h2,.paper h3{color:var(--eu-blue)}
-.paper h3{color:var(--ec-blue)}
-.paper p,.paper li{color:var(--ink-soft)}
-.paper p strong,.paper li strong{color:var(--ink)}
-.paper p em,.paper li em{font-style:normal;font-weight:700;color:var(--ec-blue);background:linear-gradient(180deg,transparent 60%,rgba(255,204,0,.35) 60%);padding:0 .05em}
-.paper ul.bullet li,.paper ol.bullet li{color:var(--ink-soft)}
-.paper ul.bullet li+li,.paper ol.bullet li+li{border-top:1px solid var(--paper-line)}
-.paper ul.bullet li::before,.paper ol.bullet li::before{color:var(--ec-blue)}
-.paper a{color:var(--ec-blue);border-bottom:1px solid rgba(0,68,148,.32);font-weight:500}
-.paper a:hover{color:var(--ep-red);border-bottom-color:var(--ep-red)}
-.paper h2.emoji-h,.paper h3.emoji-h{margin-top:2.4rem;margin-bottom:.6rem;color:var(--eu-blue);font-size:1.25rem;font-weight:600;display:flex;align-items:center;gap:.55rem}
+/* dark page overrides */
+.is-dark ul.bullet li,.is-dark ol.bullet li,.is-dark ul.bullet li:last-child,.is-dark ol.bullet li:last-child{border-color:rgba(255,255,255,.15)}
+
+/* PAPER */
+.paper{background:var(--paper);color:var(--ink);border:2.5px solid var(--ink);border-radius:24px;padding:5vh 4vw;margin:5vh 0;box-shadow:10px 10px 0 var(--accent,var(--c-orange));position:relative}
+.paper h2,.paper h3{color:var(--accent,var(--c-orange))}
+.paper h2.emoji-h,.paper h3.emoji-h{margin-top:4vh;margin-bottom:1.5vh;color:var(--accent,var(--c-orange));font-size:clamp(24px,2.4vw,36px);font-weight:700;display:flex;align-items:center;gap:.6rem;text-transform:lowercase;letter-spacing:-.015em}
 .paper h2.emoji-h:first-of-type,.paper h3.emoji-h:first-child{margin-top:0}
-.paper .emoji-h .e{font-size:1.4rem;line-height:1;flex-shrink:0}
-.paper .meta-grid{display:grid;grid-template-columns:28px 1fr;gap:.6rem 1rem;margin:.8rem 0 .4rem;align-items:center}
-.paper .meta-grid .em{font-size:1.05rem;line-height:1}
-.paper .meta-grid a{font-size:.95rem}
+.paper .emoji-h .e{font-size:1.5rem;line-height:1;flex-shrink:0}
+.paper p,.paper li{color:var(--ink)}
+.paper p strong,.paper li strong{color:var(--accent,var(--c-orange))}
+.paper ul.bullet li,.paper ol.bullet li{border-color:rgba(10,10,10,.12);color:var(--ink)}
+.paper ul.bullet li::before,.paper ol.bullet li::before{color:var(--accent,var(--c-orange))}
+.paper a{color:var(--accent,var(--c-orange));border-bottom:1.5px solid currentColor;font-weight:600}
+.paper .meta-grid{display:grid;grid-template-columns:32px 1fr;gap:1rem 1.2rem;margin:1.5rem 0;align-items:center}
+.paper .meta-grid.no-labels{display:flex;flex-direction:column;gap:.6rem;align-items:flex-start}
+.paper .meta-grid .em{font-size:1.2rem;line-height:1}
+.paper .meta-grid a{font-size:1.05rem}
+.paper .meta-grid.no-labels a{font-size:1.15rem;font-weight:500}
 
-.callout{border-left:3px solid var(--eu-gold);padding:1.2rem 1.6rem;margin:2rem 0;background:rgba(255,204,0,.04);border-radius:0 4px 4px 0}
-.callout .ck{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--eu-gold);letter-spacing:.2em;text-transform:uppercase;margin-bottom:.5rem}
-.callout p{margin:0;color:var(--paper)}
+/* CALLOUT */
+.callout{border-left:5px solid var(--accent,var(--c-orange));padding:2.5vh 2.5vw;margin:4vh 0;background:rgba(255,255,255,.5);border-radius:0 18px 18px 0}
+.is-dark .callout{background:rgba(255,255,255,.06)}
+.callout .ck{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent,var(--c-orange));letter-spacing:.2em;text-transform:uppercase;margin-bottom:.8rem;font-weight:600}
+.callout p{margin:0;font-size:clamp(16px,1.2vw,19px)}
 
-.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.4rem;margin:2rem 0}
-.card{background:rgba(255,255,255,.04);border:1px solid var(--line-soft);border-radius:6px;padding:1.7rem 1.6rem;position:relative;transition:transform .5s var(--ease-out),border-color .4s,background .4s}
-.card:hover{transform:translateY(-3px);border-color:var(--eu-gold);background:rgba(255,255,255,.06)}
-.card .num{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--eu-gold);letter-spacing:.2em;margin-bottom:.9rem;display:block}
-.card h3{margin:0 0 .6rem;color:var(--paper)}
-.card p{font-size:.93rem;margin:0}
+/* CARD GRID */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:3vh 2vw;margin:5vh 0}
+.card{background:rgba(255,255,255,.5);border:2.5px solid var(--accent,var(--c-orange));border-radius:24px;padding:4vh 2.5vw;transition:transform .4s var(--ease-out),box-shadow .4s}
+.is-dark .card{background:rgba(255,255,255,.06)}
+.card:hover{transform:translateY(-6px) rotate(-.5deg);box-shadow:6px 6px 0 var(--accent,var(--c-orange))}
+.card .num{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent,var(--c-orange));letter-spacing:.2em;margin-bottom:1.5vh;display:block;font-weight:600}
+.card h3{margin:0 0 1vh;font-family:'Space Grotesk',sans-serif;font-size:clamp(20px,1.9vw,28px);font-weight:700;text-transform:lowercase;color:var(--accent,var(--c-orange));letter-spacing:-.015em}
+.card p{font-size:clamp(14px,1vw,17px);margin:0;line-height:1.5}
 
-.seal-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin:2.2rem 0}
-.seal{text-align:center;padding:1.5rem 1rem;border:1px solid var(--line-soft);border-radius:6px;background:rgba(255,255,255,.03);transition:all .4s}
-.seal:hover{border-color:var(--eu-gold);transform:translateY(-2px);background:rgba(255,204,0,.06)}
-.seal-mark{width:56px;height:56px;margin:0 auto .8rem;border:1px solid var(--eu-gold);border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--eu-gold-warm),var(--ep-red));box-shadow:0 4px 16px rgba(190,48,38,.22)}
-.seal-mark svg{width:28px;height:28px}
-.seal h3{margin:0 0 .4rem;color:var(--paper);font-size:1rem}
-.seal p{font-size:.83rem;margin:0;line-height:1.45}
+/* SEAL ROW */
+.seal-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2vh 2vw;margin:5vh 0}
+.seal{text-align:center;padding:4vh 1.5vw;border:2.5px solid var(--accent,var(--c-orange));border-radius:24px;background:rgba(255,255,255,.5);transition:transform .4s var(--ease-out),box-shadow .4s}
+.is-dark .seal{background:rgba(255,255,255,.06)}
+.seal:hover{transform:translateY(-6px) rotate(.5deg);box-shadow:6px 6px 0 var(--accent,var(--c-orange))}
+.seal-mark{width:68px;height:68px;margin:0 auto 1.8vh;border-radius:50%;background:var(--accent,var(--c-orange));display:flex;align-items:center;justify-content:center}
+.seal-mark svg{width:32px;height:32px}
+.seal-mark svg path,.seal-mark svg circle,.seal-mark svg rect{fill:var(--paper)!important;stroke:var(--paper)!important;stroke-width:1.5}
+.seal h3{margin:0 0 1vh;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(16px,1.3vw,20px);text-transform:lowercase;letter-spacing:-.01em}
+.seal p{font-size:.92rem;margin:0;line-height:1.45}
 
-.timeline{position:relative;padding-left:2.4rem;margin:2.5rem 0}
-.timeline::before{content:'';position:absolute;left:9px;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--eu-gold) 0%,var(--eu-gold) 50%,transparent 100%)}
-.timeline-item{position:relative;margin-bottom:2.2rem;padding-bottom:.5rem}
-.timeline-item::before{content:'';position:absolute;left:-2.4rem;top:.45rem;width:18px;height:18px;border-radius:50%;background:var(--eu-blue-deep);border:2px solid var(--eu-gold);box-shadow:0 0 0 4px rgba(0,26,77,.9),0 0 12px rgba(255,204,0,.4)}
-.timeline-item .ts{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--eu-gold);letter-spacing:.2em;text-transform:uppercase;margin-bottom:.4rem}
-.timeline-item h3{margin:0 0 .6rem;color:var(--paper)}
-.timeline-item p{font-size:.95rem}
+/* TIMELINE */
+.timeline{position:relative;padding-left:3.2rem;margin:6vh 0}
+.timeline::before{content:'';position:absolute;left:13px;top:.5rem;bottom:.5rem;width:3px;background:var(--accent,var(--c-orange));border-radius:2px}
+.timeline-item{position:relative;margin-bottom:5vh;padding-bottom:1vh}
+.timeline-item::before{content:'';position:absolute;left:-3.2rem;top:.35rem;width:28px;height:28px;border-radius:50%;background:var(--accent,var(--c-orange));border:4px solid var(--bg,var(--cream));box-shadow:0 0 0 3px var(--accent,var(--c-orange))}
+.timeline-item .ts{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--accent,var(--c-orange));letter-spacing:.2em;text-transform:uppercase;margin-bottom:.8rem;font-weight:600}
+.timeline-item h3{margin:0 0 1vh;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(22px,2.2vw,32px);text-transform:lowercase;letter-spacing:-.015em;color:var(--text,var(--ink))}
+.timeline-item p{font-size:clamp(15px,1.15vw,19px)}
 
-.data-table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:.92rem;background:rgba(255,255,255,.03);border:1px solid var(--line-soft);border-radius:6px;overflow:hidden}
-.data-table th,.data-table td{padding:.9rem 1rem;text-align:left;border-bottom:1px solid var(--line-soft);color:rgba(255,255,255,.82)}
-.data-table th{background:rgba(0,68,148,.25);color:var(--eu-gold);font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;font-weight:500}
-.data-table tr:last-child td{border-bottom:none}
-.data-table tr:hover td{background:rgba(255,204,0,.04)}
-.data-table td strong{color:var(--paper);font-weight:600}
-.data-table .accent{color:var(--eu-gold);font-weight:600}
+/* DATA TABLE */
+.data-table{width:100%;border-collapse:collapse;margin:4vh 0;font-size:.96rem;background:rgba(255,255,255,.5);border:2.5px solid var(--accent,var(--c-orange));border-radius:24px;overflow:hidden}
+.is-dark .data-table{background:rgba(255,255,255,.06)}
+.data-table th,.data-table td{padding:1.3rem 1.4rem;text-align:left;border-bottom:1px solid rgba(10,10,10,.12)}
+.is-dark .data-table th,.is-dark .data-table td{border-bottom-color:rgba(255,255,255,.15)}
+.data-table th{background:var(--accent,var(--c-orange));color:var(--paper);font-family:'JetBrains Mono',monospace;font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;border-bottom:0}
+.data-table tr:last-child td{border-bottom:0}
+.data-table tr:hover td{background:rgba(0,0,0,.03)}
+.is-dark .data-table tr:hover td{background:rgba(255,255,255,.03)}
+.data-table td strong{color:var(--accent,var(--c-orange));font-weight:700}
+.data-table .accent{color:var(--accent,var(--c-orange));font-weight:700;font-size:1.05em}
 
-.hero-tags{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:2rem}
-.hero-tag{font-family:'JetBrains Mono',monospace;font-size:.7rem;padding:.4rem .85rem;border:1px solid var(--line);border-radius:999px;color:var(--eu-gold-soft);letter-spacing:.1em;text-transform:uppercase}
-.hero-tag.alt{color:var(--eu-blue-soft);border-color:rgba(108,180,228,.35)}
+/* HERO TAGS */
+.hero-tags{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:4vh}
+.hero-tag{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(13px,1vw,16px);padding:.7rem 1.4rem;background:var(--accent,var(--c-orange));color:var(--paper);border-radius:999px;text-transform:lowercase;letter-spacing:-.005em;transition:transform .3s}
+.hero-tag:hover{transform:rotate(-2deg) scale(1.05)}
+.hero-tag.alt{background:transparent;color:var(--accent,var(--c-orange));border:2.5px solid var(--accent,var(--c-orange))}
 
-.faq-item{border-bottom:1px solid var(--line-soft);padding:1.4rem 0}
-.faq-q{display:flex;justify-content:space-between;align-items:flex-start;gap:1.5rem;cursor:none;font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:500;color:var(--paper);list-style:none;transition:color .3s}
+/* FAQ */
+.faq-item{border-top:1.5px solid rgba(10,10,10,.12);padding:2.5rem 0}
+.faq-item:last-child{border-bottom:1.5px solid rgba(10,10,10,.12)}
+.faq-q{display:flex;justify-content:space-between;align-items:flex-start;gap:1.5rem;cursor:none;font-family:'Space Grotesk',sans-serif;font-size:clamp(19px,1.7vw,26px);font-weight:700;color:var(--text,var(--ink));list-style:none;text-transform:lowercase;letter-spacing:-.015em;transition:color .3s}
 .faq-q::-webkit-details-marker{display:none}
-.faq-q .qmark{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--eu-gold);flex-shrink:0;transition:transform .4s var(--ease-out);width:18px;text-align:center}
-details[open] .faq-q{color:var(--eu-gold)}
+.faq-q .qmark{font-family:'JetBrains Mono',monospace;font-size:1.5rem;color:var(--accent,var(--c-orange));flex-shrink:0;transition:transform .4s var(--ease-out);width:24px;text-align:center;font-weight:600}
+details[open] .faq-q{color:var(--accent,var(--c-orange))}
 details[open] .faq-q .qmark{transform:rotate(45deg)}
-.faq-a{padding:1rem 0 .5rem;font-size:.95rem;color:rgba(255,255,255,.82);line-height:1.65;max-width:80ch}
+.faq-a{padding:1.5rem 0 .5rem;font-size:clamp(16px,1.15vw,19px);line-height:1.65;max-width:80ch}
 
-.stage-footer{border-top:1px solid var(--line-soft);padding:2rem 2.5rem;margin-top:4rem;font-family:'JetBrains Mono',monospace;font-size:.68rem;color:rgba(255,255,255,.4);letter-spacing:.18em;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+/* FOOTER */
+.stage-footer{background:var(--c-orange);color:var(--cream);padding:6vh 5vw;margin-top:0;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(13px,1.1vw,17px);letter-spacing:.16em;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
 
+/* MOBILE */
 @media(max-width:900px){
-  .top-nav{padding:.9rem 1.2rem;gap:.8rem;flex-wrap:wrap}
-  .nav-tabs{gap:0;flex-wrap:wrap}
-  .nav-tab{padding:.5rem .8rem;font-size:.85rem}
-  .nav-dropdown{position:static;min-width:100%;opacity:1;transform:none;pointer-events:auto;display:none;box-shadow:none;border:0;padding:.4rem 0}
+  .top-nav{padding:.8rem 1.2rem;gap:.6rem;flex-wrap:wrap}
+  .nav-tabs{gap:0;flex-wrap:wrap;width:100%}
+  .nav-tab{padding:.5rem .8rem;font-size:.95rem}
+  .nav-dropdown{position:static;min-width:100%;opacity:1;transform:none;pointer-events:auto;display:none;box-shadow:none;border:0;padding:.3rem 0;background:transparent;margin-top:0}
   .nav-tab-wrap.is-open .nav-dropdown{display:block}
-  .page{padding:2rem 1.2rem 5rem}
-  .stage{padding-top:90px}
-  .stage-footer{padding:1.5rem 1.2rem;flex-direction:column;align-items:flex-start}
-  .brand-text .a{font-size:1rem}
-  .data-table{font-size:.82rem}
-  .data-table th,.data-table td{padding:.6rem .5rem}
+  .page{padding:6vh 6vw 12vh}
+  .stage{padding-top:120px}
+  .stage-footer{padding:4vh 6vw;flex-direction:column;align-items:flex-start}
+  .brand-text .a{font-size:1.1rem}
+  .data-table{font-size:.84rem}
+  .data-table th,.data-table td{padding:.8rem .7rem}
+  .paper{padding:4vh 5vw;border-radius:18px;box-shadow:6px 6px 0 var(--accent,var(--c-orange))}
 }
-.reveal{opacity:0;transform:translateY(30px)}
-.reveal.in{opacity:1;transform:translateY(0);transition:opacity 1s var(--ease-out),transform 1s var(--ease-out)}
 </style>
 </head>
 <body>
-<canvas id="shaderBg"></canvas>
-<div id="starsBg" aria-hidden="true"><svg viewBox="-100 -100 200 200" xmlns="http://www.w3.org/2000/svg"><g id="starsGroup"></g></svg></div>
-<svg class="hex-grid" aria-hidden="true"><defs><pattern id="hexpat" width="60" height="52" patternUnits="userSpaceOnUse" patternTransform="translate(30,26)"><polygon points="30,2 56,16 56,40 30,54 4,40 4,16" fill="none" stroke="#FFCC00" stroke-width="0.5"/></pattern></defs><rect width="100%" height="100%" fill="url(#hexpat)"/></svg>
-<svg class="grain" aria-hidden="true"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="2.5" numOctaves="3" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.5 0"/></filter><rect width="100%" height="100%" filter="url(#noiseFilter)"/></svg>
-<div class="cursor-dot"></div><div class="cursor-ring"></div>
+<div class="scroll-progress" id="scrollProgress"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursorDot"></div>
 
 <header class="top-chrome">
 <nav class="top-nav">
-<a class="brand" href="#pozicia/predstavenie" id="brandLink"><div class="brand-text"><span class="a">Smatana</span><span class="b">Vedúci grantového tímu · Brief</span></div></a>
+<a class="brand" href="#naplna/predstavenie" id="brandLink"><div class="brand-text"><span class="a">Smatana</span><span class="b">Vedúci grantového tímu · Brief</span></div></a>
 <ul class="nav-tabs" id="navTabs">
 <li class="nav-tab-wrap" data-section="stuudio"><button class="nav-tab" data-section="stuudio">Štúdio</button>
 <div class="nav-dropdown">
 <button class="dropdown-item" data-section="stuudio" data-slug="kto-sme">Kto sme</button>
-<button class="dropdown-item" data-section="stuudio" data-slug="pravne-subjekty">Právne subjekty</button>
 <button class="dropdown-item" data-section="stuudio" data-slug="preco-granty">Prečo granty</button>
-<button class="dropdown-item" data-section="stuudio" data-slug="sance">Šance na úspech</button>
 </div></li>
-<li class="nav-tab-wrap" data-section="pozicia"><button class="nav-tab is-active" data-section="pozicia">Pozícia</button>
+<li class="nav-tab-wrap" data-section="naplna"><button class="nav-tab is-active" data-section="naplna">Náplň práce</button>
 <div class="nav-dropdown">
-<button class="dropdown-item is-active" data-section="pozicia" data-slug="predstavenie">Predstavenie spolupráce</button>
-<button class="dropdown-item" data-section="pozicia" data-slug="profil">Profil ideálneho kandidáta</button>
-<button class="dropdown-item" data-section="pozicia" data-slug="naplna">Náplň práce</button>
-<button class="dropdown-item" data-section="pozicia" data-slug="po-schvaleni">Práca po schválení grantu</button>
+<button class="dropdown-item is-active" data-section="naplna" data-slug="predstavenie">Predstavenie spolupráce</button>
+<button class="dropdown-item" data-section="naplna" data-slug="riadenie">Riadenie tímu</button>
+<button class="dropdown-item" data-section="naplna" data-slug="ziadosti">Práca so žiadosťami</button>
+<button class="dropdown-item" data-section="naplna" data-slug="systemy-ai">Systémy, AI a dokumentácia</button>
+<button class="dropdown-item" data-section="naplna" data-slug="realizacia">Realizácia, reporting a audit</button>
+<button class="dropdown-item" data-section="naplna" data-slug="hranice">Hranice zodpovednosti</button>
 </div></li>
 <li class="nav-tab-wrap" data-section="podmienky"><button class="nav-tab" data-section="podmienky">Podmienky</button>
 <div class="nav-dropdown">
+<button class="dropdown-item" data-section="podmienky" data-slug="profil">Profil ideálneho kandidáta</button>
 <button class="dropdown-item" data-section="podmienky" data-slug="odmena">Odmena</button>
 <button class="dropdown-item" data-section="podmienky" data-slug="benefity">Benefity</button>
 <button class="dropdown-item" data-section="podmienky" data-slug="hodnotenie">Hodnotenie</button>
 </div></li>
-<li class="nav-tab-wrap" data-section="systemy"><button class="nav-tab" data-section="systemy">Systémy</button>
-<div class="nav-dropdown">
-<button class="dropdown-item" data-section="systemy" data-slug="nastroje">Nástroje a systémy</button>
-<button class="dropdown-item" data-section="systemy" data-slug="ai">Využitie umelej inteligencie</button>
-<button class="dropdown-item" data-section="systemy" data-slug="ekosystem">Grantový ekosystém</button>
-</div></li>
-<li class="nav-tab-wrap" data-section="faq"><button class="nav-tab" data-section="faq">FAQ</button></li>
 </ul>
 <div></div>
 </nav>
@@ -222,115 +236,66 @@ details[open] .faq-q .qmark{transform:rotate(45deg)}
 <main class="stage" id="stage">
 
 <!-- ============== ŠTÚDIO / KTO SME ============== -->
-<article class="page" data-page="stuudio/kto-sme">
+<article class="page" data-page="stuudio/kto-sme" style="--bg:#ffffff;--accent:#ff6b01;--text:#0a0a0a">
   <div class="kicker"><span>Štúdio</span><span class="num">· Kto sme</span></div>
-  <h1 class="page-title">Štúdio na pomedzí<br><em>umenia</em> a technológie.</h1>
+  <h1 class="page-title">Kto sme.</h1>
   <div class="paper bordered">
-    <h2 class="emoji-h"><span class="e">🎬</span><span>Smatana</span></h2>
+    <h2 class="emoji-h"><span>Smatana</span></h2>
     <ul class="bullet">
       <li>Smatana je kreatívne štúdio na pomedzí umenia a technológie, ktoré spája autorskú filmovú tvorbu s komerčnými projektmi pre globálne značky.</li>
-      <li>Sídlime v <a href="https://kct.sk/" target="_blank" rel="noopener"><strong>Kreatívnom centre v Trnave</strong></a>, ale pracujeme remote-friendly s tímom asi 30 freelancerov naprieč Európou.</li>
-      <li>Celosvetovo nás zastupuje prestížna agentúra <a href="https://www.thisisjelly.com/uk/talent/martin-smatana" target="_blank" rel="noopener"><strong>Jelly New York</strong></a>.</li>
+      <li>Sídlime v <a href="https://kct.sk/" target="_blank" rel="noopener"><strong>Kreatívnom centre v Trnave</strong></a> a pracujeme remote-friendly s tímom asi 30 freelancerov naprieč Európou.</li>
+      <li>Celosvetovo nás zastupuje agentúra <a href="https://www.thisisjelly.com/uk/talent/martin-smatana" target="_blank" rel="noopener"><strong>Jelly New York</strong></a>.</li>
     </ul>
-    <h2 class="emoji-h"><span class="e">🎨</span><span>Čo tvoríme</span></h2>
+    <h2 class="emoji-h"><span>Čo tvoríme</span></h2>
     <ul class="bullet">
       <li>Autorské animované filmy v medzinárodnej koprodukcii s celosvetovou distribúciou.</li>
       <li>Ilustrované knihy vychádzajúce v USA, Veľkej Británii, Nemecku a Južnej Kórei.</li>
       <li>Reklamy a kampane pre komerčné značky <a href="https://smatana.com/washington-post" target="_blank" rel="noopener"><strong>The Washington Post</strong></a>, <a href="https://smatana.com/milka" target="_blank" rel="noopener"><strong>Milka</strong></a>, <a href="https://smatana.com/orange" target="_blank" rel="noopener"><strong>Orange</strong></a>, <a href="https://smatana.com/mcdonalds" target="_blank" rel="noopener"><strong>McDonald's</strong></a>, <a href="https://www.instagram.com/reel/DJ7Gj7Jqs2h/" target="_blank" rel="noopener"><strong>Francúzsky inštitút</strong></a>, <a href="https://www.forbes.sk/lists/rebricek-najbohatsi-slovaci-2025/" target="_blank" rel="noopener"><strong>Forbes</strong></a>, <a href="https://smatana.com/donio" target="_blank" rel="noopener"><strong>Donio</strong></a>, <a href="https://smatana.com/mcdonalds" target="_blank" rel="noopener"><strong>Plamienok</strong></a>, <a href="https://smatana.com/festival-bab" target="_blank" rel="noopener"><strong>Festival BAB</strong></a>, BeLenka, Old Herold, Shimano, Novesta, Kúpele Aphrodite.</li>
     </ul>
-    <h2 class="emoji-h"><span class="e">🏆</span><span>Naše úspechy</span></h2>
+    <h2 class="emoji-h"><span>Naše úspechy</span></h2>
     <ul class="bullet">
-      <li>Premiéry na A-rated festivale <a href="https://kultura.pravda.sk/galeria/clanok/498475-slovenskeho-sarkana-vybrali-do-sutaze-na-berlinale/" target="_blank" rel="noopener"><strong>Berlinale</strong></a></li>
-      <li><a href="https://smatana.com/awards" target="_blank" rel="noopener"><strong>87 medzinárodných ocenení</strong></a></li>
-      <li>2× cena na najväčšom festivale animovaných filmov na svete v <a href="https://kultura.sme.sk/c/23347908/slovensky-animovany-film-ocenili-prestiznou-cenou-na-festivale-vo-francuzskom-annecy.html" target="_blank" rel="noopener"><strong>Annecy</strong></a></li>
-      <li>Nominácia do <a href="https://www.noviny.sk/slovensko/456935-prestiznu-sosku-oskara-by-mohol-ziskat-aj-slovak-ocenenia-zbiera-uz-po-celom-svete" target="_blank" rel="noopener"><strong>semifinále študentských Oscarov</strong></a></li>
-      <li><a href="https://enrsi.stvr.sk/articles/Culture/198059/what-slovak-can-be-seen-in-moma" target="_blank" rel="noopener"><strong>Prvý slovenský film v zbierke MoMA</strong></a> v New Yorku, kde sa dodnes premietame v náučnom cykle pre rodiny s deťmi</li>
-      <li>Držiteľ slovenských cien <a href="https://smatana.com/sun-in-a-net" target="_blank" rel="noopener"><strong>Slnko v sieti</strong></a>, Igric, Viktor Kubal a <a href="https://smatana.com/tatrabanka" target="_blank" rel="noopener"><strong>Nadácia Tatra banky</strong></a></li>
-      <li>Zaradenie do rebríčka <a href="https://www.forbes.sk/30pod30-rocnik-2021/11-martin-smatana" target="_blank" rel="noopener"><strong>Forbes 30 pod 30</strong></a> (founder &amp; Creative Director)</li>
+      <li>Premiéry na A-rated festivale <strong>Berlinale</strong></li>
+      <li><strong>87 medzinárodných ocenení</strong></li>
+      <li>2× cena na najväčšom festivale animovaných filmov na svete v <strong>Annecy</strong></li>
+      <li>Nominácia do <strong>semifinále študentských Oscarov</strong></li>
+      <li><strong>Prvý slovenský film v zbierke MoMA</strong> v New Yorku, kde sa dodnes premietame v náučnom cykle pre rodiny s deťmi</li>
+      <li>Držiteľ slovenských cien <strong>Slnko v sieti</strong>, Igric, Viktor Kubal a <strong>Nadácia Tatra banky</strong></li>
+      <li>Zaradenie do rebríčka <strong>Forbes 30 pod 30</strong> (founder &amp; Creative Director)</li>
       <li>Nominácia na Najkrajšie knihy Slovenska</li>
     </ul>
-    <h2 class="emoji-h"><span class="e">📰</span><span>Napísali o nás</span></h2>
+    <h2 class="emoji-h"><span>Napísali o nás</span></h2>
     <ul class="bullet">
-      <li><strong>Zahraničné portály</strong> — <a href="https://www.thisisjelly.com/uk/news/introducing-martin-smatana" target="_blank" rel="noopener"><strong>Jelly london</strong></a>, <a href="https://www.thisiscolossal.com/2022/12/martin-smatana-the-kite/" target="_blank" rel="noopener"><strong>Colossal</strong></a>, <a href="https://www.designboom.com/art/colorful-felt-figures-martin-smatana-illustration-10-good-news-12-29-2022/" target="_blank" rel="noopener"><strong>Designboom</strong></a>, <a href="https://www.shortoftheweek.com/2023/01/23/the-kite/" target="_blank" rel="noopener"><strong>Short of the week</strong></a>, <a href="https://www.boredpanda.com/illustrations-a-year-of-good-news-martin-smatana/" target="_blank" rel="noopener"><strong>Bored panda</strong></a>, <a href="https://page-online.de/bild/portraet-der-woche-martin-smatana/" target="_blank" rel="noopener"><strong>Page.de</strong></a>, <a href="https://hypeandhyper.com/en/positive-news-isnt-actually-that-rare/" target="_blank" rel="noopener"><strong>Hype&amp;hyper</strong></a>, <a href="https://www.zippyframes.com/index.php/shorts/the-kite-by-martin-smatana" target="_blank" rel="noopener"><strong>Zippy frames</strong></a>, <a href="https://www.skwigly.co.uk/martin-smatana-interview-the-kite/" target="_blank" rel="noopener"><strong>Skwigly</strong></a>, <a href="https://www.forbes.sk/30pod30-rocnik-2021/11-martin-smatana" target="_blank" rel="noopener"><strong>Forbes</strong></a>, <a href="https://www.atlantafilmandtv.com/post/atlanta-film-and-tv-interviews-filmmaker-and-stop-motion-animator-martin-smatana-of-the-kite" target="_blank" rel="noopener"><strong>Atlanta Film and TV</strong></a>, <a href="https://spectator.sme.sk/c/22298465/martin-smatana-made-internationally-awarded-animated-film.html" target="_blank" rel="noopener"><strong>The Slovak Spectator</strong></a>, <a href="https://stopmotionmagazine.com/the-kite-poustet-draka-making-of-by-martin-smatana/" target="_blank" rel="noopener"><strong>Stopmotion Magazine</strong></a></li>
-      <li><strong>Slovenské portály</strong> — <a href="https://domov.sme.sk/c/23099956/dobre-spravy-2022-muz-ktory-sadil-stromy-aj-chlapec-ktory-sam-presiel-cez-celu-ukrajinu.html" target="_blank" rel="noopener"><strong>Sme</strong></a>, <a href="https://dennikn.sk/2479985/" target="_blank" rel="noopener"><strong>Denník N</strong></a>, <a href="https://www.funradio.sk/clanok/42143-slovensky-animovany-film-zbiera-medzinarodne-ocenenia/" target="_blank" rel="noopener"><strong>Funradio</strong></a>, <a href="https://devin.stvr.sk/clanky/kulturny-dennik/199820/sarkan-najlepsim-slovenskym-animakom" target="_blank" rel="noopener"><strong>Rtvs</strong></a>, <a href="https://www.aktuality.sk/clanok/907806/" target="_blank" rel="noopener"><strong>Aktuality</strong></a>, <a href="https://www.forbes.sk/30pod30-rocnik-2021/11-martin-smatana" target="_blank" rel="noopener"><strong>Forbes</strong></a>, <a href="https://kultura.pravda.sk/film-a-televizia/clanok/575528-ocenovany-animak-sarkan-citlivo-priblizuje-stratu-blizkeho/" target="_blank" rel="noopener"><strong>Pravda</strong></a>, <a href="https://emefka.sk/slovak-martin-zachytava-dobre-spravy-uplynuleho-roka-v-netradicnej-knihe/" target="_blank" rel="noopener"><strong>Emefka</strong></a>, <a href="https://www.miaumagazin.sk/home/martin-smatana-mam-rad-pribehy-ktore-dokazu-vtiahnut-do-ineho-sveta/" target="_blank" rel="noopener"><strong>Miau</strong></a>, <a href="https://www.zilinak.sk/clanky/17417/" target="_blank" rel="noopener"><strong>Žilinak</strong></a></li>
+      <li><strong>Zahraničné portály</strong> - <a href="https://www.thisisjelly.com/uk/news/introducing-martin-smatana" target="_blank" rel="noopener"><strong>Jelly london</strong></a>, <a href="https://www.thisiscolossal.com/2022/12/martin-smatana-the-kite/" target="_blank" rel="noopener"><strong>Colossal</strong></a>, <a href="https://www.designboom.com/art/colorful-felt-figures-martin-smatana-illustration-10-good-news-12-29-2022/" target="_blank" rel="noopener"><strong>Designboom</strong></a>, <a href="https://www.shortoftheweek.com/2023/01/23/the-kite/" target="_blank" rel="noopener"><strong>Short of the week</strong></a>, <a href="https://www.boredpanda.com/illustrations-a-year-of-good-news-martin-smatana/" target="_blank" rel="noopener"><strong>Bored panda</strong></a>, <a href="https://page-online.de/bild/portraet-der-woche-martin-smatana/" target="_blank" rel="noopener"><strong>Page.de</strong></a>, <a href="https://hypeandhyper.com/en/positive-news-isnt-actually-that-rare/" target="_blank" rel="noopener"><strong>Hype&amp;hyper</strong></a>, <a href="https://www.zippyframes.com/index.php/shorts/the-kite-by-martin-smatana" target="_blank" rel="noopener"><strong>Zippy frames</strong></a>, <a href="https://www.skwigly.co.uk/martin-smatana-interview-the-kite/" target="_blank" rel="noopener"><strong>Skwigly</strong></a>, <a href="https://www.forbes.sk/30pod30-rocnik-2021/11-martin-smatana" target="_blank" rel="noopener"><strong>Forbes</strong></a>, <a href="https://www.atlantafilmandtv.com/post/atlanta-film-and-tv-interviews-filmmaker-and-stop-motion-animator-martin-smatana-of-the-kite" target="_blank" rel="noopener"><strong>Atlanta Film and TV</strong></a>, <a href="https://spectator.sme.sk/c/22298465/martin-smatana-made-internationally-awarded-animated-film.html" target="_blank" rel="noopener"><strong>The Slovak Spectator</strong></a>, <a href="https://stopmotionmagazine.com/the-kite-poustet-draka-making-of-by-martin-smatana/" target="_blank" rel="noopener"><strong>Stopmotion Magazine</strong></a></li>
+      <li><strong>Slovenské portály</strong> - <a href="https://domov.sme.sk/c/23099956/dobre-spravy-2022-muz-ktory-sadil-stromy-aj-chlapec-ktory-sam-presiel-cez-celu-ukrajinu.html" target="_blank" rel="noopener"><strong>Sme</strong></a>, <a href="https://dennikn.sk/2479985/" target="_blank" rel="noopener"><strong>Denník N</strong></a>, <a href="https://www.funradio.sk/clanok/42143-slovensky-animovany-film-zbiera-medzinarodne-ocenenia/" target="_blank" rel="noopener"><strong>Funradio</strong></a>, <a href="https://devin.stvr.sk/clanky/kulturny-dennik/199820/sarkan-najlepsim-slovenskym-animakom" target="_blank" rel="noopener"><strong>Rtvs</strong></a>, <a href="https://www.aktuality.sk/clanok/907806/" target="_blank" rel="noopener"><strong>Aktuality</strong></a>, <a href="https://www.forbes.sk/30pod30-rocnik-2021/11-martin-smatana" target="_blank" rel="noopener"><strong>Forbes</strong></a>, <a href="https://kultura.pravda.sk/film-a-televizia/clanok/575528-ocenovany-animak-sarkan-citlivo-priblizuje-stratu-blizkeho/" target="_blank" rel="noopener"><strong>Pravda</strong></a>, <a href="https://emefka.sk/slovak-martin-zachytava-dobre-spravy-uplynuleho-roka-v-netradicnej-knihe/" target="_blank" rel="noopener"><strong>Emefka</strong></a>, <a href="https://www.miaumagazin.sk/home/martin-smatana-mam-rad-pribehy-ktore-dokazu-vtiahnut-do-ineho-sveta/" target="_blank" rel="noopener"><strong>Miau</strong></a>, <a href="https://www.zilinak.sk/clanky/17417/" target="_blank" rel="noopener"><strong>Žilinak</strong></a></li>
     </ul>
-    <h2 class="emoji-h"><span class="e">✨</span><span>Kam smerujeme</span></h2>
+    <h2 class="emoji-h"><span>Kam smerujeme</span></h2>
     <ul class="bullet">
-      <li>Pokračujeme v kombinácii autorskej tvorby a medzinárodných komerčných projektov s tímami z celej Európy.</li>
-      <li>Experimentujeme s použitím AI nástrojov v kreatívnom priemysle a expandujeme do AI video produkcie.</li>
+      <li>Pokračujeme v kombinácii autorskej tvorby a medzinárodných komerčných projektov.</li>
+      <li>Experimentujeme s použitím AI nástrojov v kreatívnom priemysle.</li>
       <li>Vyvíjame vlastné digitálne produkty.</li>
       <li>Digitálnu animáciu rozširujeme aj do web designu.</li>
-      <li>Budujeme tím, ktorý kombinuje kreatívnu tvorbu s profesionálnymi procesmi.</li>
     </ul>
-    <h2 class="emoji-h"><span class="e">⬇️</span><span>Viac informácií na</span></h2>
-    <div class="meta-grid">
-      <span class="em">🌐</span><a href="https://smatana.com/" target="_blank" rel="noopener">www.smatana.com</a>
-      <span class="em">✉️</span><a href="mailto:martin@smatana.com">martin@smatana.com</a>
-      <span class="em">📸</span><a href="https://www.instagram.com/martin.smatana/" target="_blank" rel="noopener">Instagram</a>
-      <span class="em">☎️</span><a href="tel:+421918580240">+421 918 580 240</a>
+    <h2 class="emoji-h"><span>Viac informácií na</span></h2>
+    <div class="meta-grid no-labels">
+      <a href="https://smatana.com/" target="_blank" rel="noopener">www.smatana.com</a>
+      <a href="mailto:hello@smatana.com">hello@smatana.com</a>
+      <a href="https://www.instagram.com/martin.smatana/" target="_blank" rel="noopener">Instagram</a>
+      <a href="tel:+421918580240">+421 918 580 240</a>
     </div>
   </div>
 </article>
 
-<!-- ============== ŠTÚDIO / PRÁVNE SUBJEKTY ============== -->
-<article class="page" data-page="stuudio/pravne-subjekty">
-  <div class="kicker"><span>Štúdio</span><span class="num">· Právne subjekty</span></div>
-  <h1 class="page-title">Tri samostatné<br><em>právne</em> subjekty.</h1>
-  <p class="lede">Zázemie našej práce tvoria tri samostatné právne subjekty. Toto rozdelenie sme vybudovali postupne ako prirodzenú odpoveď na rôznorodosť našich projektov. Umožňuje nám to pristupovať k výzvam transparentne a presne podľa pravidiel jednotlivých poskytovateľov podpory — od autorských filmov cez vzdelávacie aktivity až po technologický výskum.</p>
-
-  <h2>1. Studio Bororo s.r.o. — Filmová tvorba a medzinárodné koprodukcie</h2>
-  <p>Spoločnosť s ručením obmedzeným bola založená v máji 2020 so sídlom v Žiline. Konateľmi sú Martin Smatana a Michal Smatana s rovnakým podielom (50/50). Predstavuje hlavnú filmovú a produkčnú vetvu nášho zázemia.</p>
-  <ul class="bullet">
-    <li><strong>Doterajšie výsledky:</strong> Cez tento subjekt prebehol vývoj a výroba krátkeho animovaného filmu <em>Ahoj leto</em> (2024), ktorý režíroval Martin Smatana spoločne s Veronikou Zacharovou. Išlo o medzinárodnú koprodukciu Slovenska, Česka (partneri MAUR film a Last Films) a Francúzska (štúdio Vivement Lundi !).</li>
-    <li><strong>História financovania:</strong> Projekt získal podporu z Audiovizuálneho fondu (AVF) vo výške 11 000 eur na vývoj a 65 000 eur na samotnú výrobu. Celkový rozpočet projektu bol 185 000 eur. Na pripravovaný projekt Včelár Jožko získal podporu 20 000 eur. Vďaka tomu má spoločnosť riadne doloženú históriu a overenú dôveryhodnosť pre schémy AVF, podprogram MEDIA programu Kreatívna Európa či fond Eurimages, kde je preukázaná činnosť producenta základnou podmienkou.</li>
-    <li><strong>Členstvo v sieťach:</strong> Spoločnosť je členom Asociácie producentov animovaných filmov (APAF), čo jej otvára dvere do platformy Visegrad Animation Forum a širšej stredoeurópskej siete animácie, cez ktorú prebieha dôležitá časť regionálneho koprodukčného financovania.</li>
-    <li><strong>Hlavné využitie:</strong> Subjekt je určený pre projekty s čistým filmovým charakterom, autorské animované diela, koprodukčné schémy a podpory distribúcie. Aktuálne zastrešuje napríklad vývoj nového krátkeho animovaného filmu <em>Včelár Jožko</em> (momentálne v slovenskej produkcii).</li>
-  </ul>
-
-  <h2>2. Burizon o.z. — Kultúra, vzdelávanie a občianska spoločnosť</h2>
-  <p>Občianske združenie bolo registrované 5. októbra 2022 na Okresnom úrade Trnava (IČO: 54852668, sídlo: Ulica Vladimíra Clementisa 6644/28, 917 01 Trnava). Štatutárnym orgánom s právom konať samostatne je riaditeľ Martin Smatana. Členkami prípravného výboru sú Simona Čechová a Kamila Gosciniak.</p>
-  <ul class="bullet">
-    <li><strong>Poslanie a ciele:</strong> Združenie spája autorov, ilustrátorov a vizuálnych umelcov so zámerom pozitívne formovať hodnoty mladého publika cez poučné príbehy. Medzi hlavné ciele patrí vzdelávanie mladého diváka, podpora nezávislých knižných tvorcov, popularizácia ilustrácie a animácie a pomoc pri rozvoji tvorivých schopností.</li>
-    <li><strong>Rozsah činnosti:</strong> Štatutárne ciele pokrývajú vydavateľskú činnosť, produkciu a distribúciu audiovizuálnych diel, organizovanie výstav, festivalov, seminárov a workshopov, zachovanie kultúrnych hodnôt a podporu dobrovoľníctva.</li>
-    <li><strong>Dotačné možnosti:</strong> Tento široký neziskový záber spĺňa kritériá pre programy Erasmus+ (kategória KA220 pre vzdelávanie dospelých aj školské vzdelávanie), program Občania, rovnosť, práva a hodnoty (CERV), kultúrne projekty spolupráce v programe Kreatívna Európa, Medzinárodný vyšehradský fond a domáci Fond na podporu umenia. Vhodný je tiež pre súkromné nadácie typu Nadácia Roberta Boscha či Európska kultúrna nadácia a línie zamerané na občianske vzdelávanie a digitálne občianstvo.</li>
-    <li><strong>Zameranie projektov:</strong> Cez tento subjekt rozvíjame projekty s jasnou spoločenskou a edukačnou misiou. Patria sem iniciatívy <em>Compactino</em> (zvyšovanie digitálnej gramotnosti detí a seniorov v oblasti umelej inteligencie), <em>Interactoons</em> (výskumno-pedagogická spolupráca), občiansky orientovaný projekt <em>Keď vtáky prestali spievať</em> a pripravovaný projekt zameraný na ochranu životného prostredia.</li>
-  </ul>
-
-  <h2>3. Smatana OÜ — Technologický výskum a seversko-pobaltský región</h2>
-  <p>Najmladší subjekt bol založený v januári 2026 v Estónsku (sídlo: Sepapaja tn 6, Lasnamäe linnaosa, Tallinn 11415). Jediným členom predstavenstva je Martin Smatana. Účtovné a administratívne zázemie zabezpečuje servisná platforma XOLO.</p>
-  <ul class="bullet">
-    <li><strong>Aktuálny stav a stratégia:</strong> Spoločnosť zatiaľ nemá transakčnú históriu. To síce v krátkodobom horizonte obmedzuje prístup k fondom, ktoré prísne hodnotia okamžitú finančnú kapacitu žiadateľa (ako Horizont Európa či väčšie európske výzvy), no z dlhodobého hľadiska nám toto zázemie otvára dvere do dvoch dôležitých ekosystémov, ktoré sú zo Slovenska ťažšie dostupné.</li>
-    <li><strong>Hlavná činnosť (podľa kódov EMTAK):</strong> Hlavnou registrovanou oblasťou je dizajn a animovaný dizajn (kód 74101), doplnkovou činnosťou je grafický dizajn a vizuálna komunikácia (kód 74121). Firemným kontaktom je adresa martin@smatana.com a webové sídlo <a href="https://www.smatana.com/" target="_blank" rel="noopener">www.smatana.com</a>.</li>
-    <li><strong>Estónsky národný systém výskumu a vývoja:</strong> Schémy spravované agentúrou Enterprise Estonia (EAS+KredEx), ktoré zahŕňajú granty na rozvoj malých a stredných podnikov do 35 000 eur, inovačné poukážky do 7 500 eur (s 20 % spolufinancovaním) alebo Program rozvoja podnikania s podporou do 500 000 eur pre medzinárodný rast. Pre kreatívny sektor sú dôležité aj špecifické granty na rozvoj exportnej kapacity a implementáciu rozvojových plánov, oba do výšky 75 000 eur na projekt.</li>
-    <li><strong>Seversko-pobaltská spolupráca:</strong> Možnosti financovania cez Severský kultúrny bod, Severský filmový a televízny fond a estónske zastúpenie programu Kreatívna Európa pri Estónskom filmovom inštitúte. Estónske prostredie je vnímané ako technologicky pokrokové a otvorené inováciám.</li>
-    <li><strong>Inovačné programy EÚ:</strong> Výzvy v rámci Horizont Európa a program EIC Accelerator, ktorý ponúka podporu pre rozvoj prelomových inovácií. Estónsko má dlhodobo vysokú úspešnosť v týchto programoch v prepočte na obyvateľa.</li>
-    <li><strong>Paralelný prístup:</strong> Keďže Estónsko patrí medzi oprávnené krajiny programu Kreatívna Európa, táto spoločnosť môže žiadať o podporu rovnocenne so slovenským štúdiom. To nám umožňuje v plnom súlade s pravidlami predkladať upravené projekty do rovnakých schém z dvoch rôznych krajín.</li>
-  </ul>
-
-  <h2>Prehľad synergie v ekosystéme</h2>
-  <p>Každý subjekt slúži inej skupine dotačných programov, čím predchádzame duplicite a vytvárame stabilné zázemie pre tvorbu:</p>
-  <table class="data-table">
-    <thead><tr><th>Právny subjekt</th><th>Hlavný prínos</th><th>Dotačná rodina</th></tr></thead>
-    <tbody>
-      <tr><td><strong>Studio Bororo s.r.o.</strong></td><td>Filmová história a koprodukčné vzťahy</td><td>AVF, Kreatívna Európa MEDIA, Eurimages</td></tr>
-      <tr><td><strong>Burizon o.z.</strong></td><td>Spoločenská misia a vzdelávanie</td><td>FPU, Erasmus+, CERV, Vyšehradský fond, nadácie</td></tr>
-      <tr><td><strong>Smatana OÜ</strong></td><td>Technológie, výskum a pobaltské väzby</td><td>EAS+KredEx, Severské fondy, Horizont Európa</td></tr>
-    </tbody>
-  </table>
-  <p>Hlavnou úlohou grantového oddelenia je využiť túto štruktúru tak, aby sa jeden silný materský koncept mohol v rôznych cielených obmenách uchádzať o podporu cez ten subjekt, pre ktorý je daná výzva najprirodzenejšia.</p>
-</article>
-
 <!-- ============== ŠTÚDIO / PREČO GRANTY ============== -->
-<article class="page" data-page="stuudio/preco-granty">
+<article class="page" data-page="stuudio/preco-granty" style="--bg:#fc98b2;--accent:#2c1f39;--text:#2a0c14">
   <div class="kicker"><span>Štúdio</span><span class="num">· Prečo granty</span></div>
-  <h1 class="page-title">Strategický mechanizmus,<br>nie iba finančný <em>nástroj</em>.</h1>
-  <p class="lede">Financovanie tvorivých projektov prostredníctvom európskych a medzinárodných grantov nevnímame len ako finančný nástroj. Je to najmä strategický mechanizmus, ktorý umožňuje vznik diel a produktov, ktoré by na čisto komerčnej báze v Európe nikdy nevznikli, prípadne by z dôvodu trhových tlakov museli prijať priveľa umeleckých alebo hodnotových kompromisov.</p>
+  <h1 class="page-title">Prečo granty.</h1>
+  <p class="lede"><strong>Financovanie tvorivých projektov prostredníctvom európskych a medzinárodných grantov vnímame ako strategický mechanizmus, ktorý umožňuje vznik diel a produktov, ktoré by na čisto komerčnej báze v Európe nikdy nevznikli, prípadne by z dôvodu trhových tlakov museli prijať priveľa umeleckých alebo hodnotových kompromisov.</strong></p>
 
   <h2>Dôležitosť podpory pre nezávislú tvorbu</h2>
   <p>Bez grantového financovania by autorské animované filmy, obrázkové knihy v jazykoch národnostných menšín, projekty prepojené s miestnou kultúrou naprieč rôznymi médiami či vzdelávacie technológie pre špecifické komunity len ťažko hľadali podporu. Komerčné štúdiá a investori prirodzene vyhľadávajú projekty s rýchlou návratnosťou, čo zo systému často vylučuje zámery s najvyššou kultúrnou, vzdelávacou a spoločenskou hodnotou.</p>
   <p>Verejné zdroje preto chápeme ako kapitál, ktorý nám umožňuje:</p>
   <ul class="bullet">
-    <li>Vyvíjať vysoko kvalitnú animovanú tvorbu bez komerčného tlaku na obsah.</li>
+    <li>Vyvíjať kvalitnú animovanú tvorbu bez komerčného tlaku na obsah.</li>
     <li>Dôsledne overovať vzdelávacie produkty v praxi priamo s pedagógmi a odborníkmi.</li>
     <li>Budovať nástroje umelej inteligencie pre mladé publikum etickým a bezpečným spôsobom.</li>
     <li>Vytvárať nadčasové diela, ktoré budú v spoločnosti rezonovať aj po mnohých rokoch.</li>
@@ -353,363 +318,194 @@ details[open] .faq-q .qmark{transform:rotate(45deg)}
   <h2>Celospoločenský a etický rozmer</h2>
   <p>V oblastiach, ako sú umelá inteligencia, vzdelávacie technológie a bezpečné digitálne prostredie pre deti, existuje priama potreba verejnej podpory. Tieto témy sú príliš dôležité na to, aby sa prenechali výhradne voľnému trhu.</p>
   <p>Digitálne produkty pre deti, ktoré rešpektujú európske nariadenia o ochrane osobných údajov a o umelej inteligencii, sú jazykovo i kultúrne prispôsobené menším európskym trhom a navrhnuté s pedagogickou integritou, nemôžu cenovo konkurovať globálnym technologickým gigantom financovaným z cielenej reklamy a zberu užívateľských dát. Granty vyrovnávajú túto trhovú asymetriu. Umožňujú vznik európskych riešení, ktoré môžu rodičia, učitelia a kultúrne inštitúcie využívať bez etických kompromisov.</p>
-  <p>Tento prístup nevnímame ako dotáciu v negatívnom zmysle, ale ako <em>investíciu do verejného dobra</em>, kvality detstva, demokratickej odolnosti spoločnosti a do zachovania vlastného tvorivého a technologického hlasu Európy. Práca nášho štúdia sa zámerne zameriava na tieto prieniky, čo presne zodpovedá cieľom európskych programov. Financovanie cez tieto zdroje je pre nás legitímny a strategicky správny spôsob budovania udržateľného prostredia postaveného na hodnotách.</p>
-</article>
+  <p>Tento prístup nevnímame ako dotáciu v negatívnom zmysle, ale ako <em>investíciu do verejného dobra</em>, kvality detstva, demokratickej odolnosti spoločnosti a do zachovania vlastného tvorivého a technologického hlasu Európy. Financovanie cez tieto zdroje je pre nás legitímny a strategicky správny spôsob budovania udržateľného prostredia postaveného na hodnotách.</p>
 
-<!-- ============== ŠTÚDIO / ŠANCE NA ÚSPECH ============== -->
-<article class="page" data-page="stuudio/sance">
-  <div class="kicker"><span>Štúdio</span><span class="num">· Šance na úspech</span></div>
-  <h1 class="page-title">Low-risk,<br><em>high-impact</em> žiadateľ.</h1>
-  <p class="lede">Štúdio Smatana má mimoriadne silnú štartovaciu pozíciu pri grantových žiadostiach. Spája totiž vzácnu kombináciu vlastností, ktoré hodnotitelia fondov priamo vyžadujú: medzinárodne uznávanú tvorivú dôveryhodnosť, schopnosť zasiahnuť publikum na viacerých trhoch a preukázateľný celospoločenský prínos. Pre európske aj národné komisie predstavuje štúdio ideálneho žiadateľa s nízkym rizikom a vysokým prínosom.</p>
+  <h2>Šance na úspech</h2>
+  <p><strong>Veríme, že štúdio môže mať pomerne silnú štartovaciu pozíciu pri grantových žiadostiach. Spája totiž kombináciu vlastností, ktoré môžu byť pre hodnotiteľov fondov potenciálne dobre hodnotené: medzinárodne uznávanú tvorivú dôveryhodnosť, schopnosť zasiahnuť publikum na viacerých trhoch a preukázateľný celospoločenský prínos.</strong></p>
 
-  <div class="seal-row">
-    <div class="seal"><div class="seal-mark"><svg viewBox="0 0 24 24"><path d="M12 2 L14.5 8.5 L21 9 L16 13.5 L17.5 20 L12 16.5 L6.5 20 L8 13.5 L3 9 L9.5 8.5 Z" fill="#003399"/></svg></div><h3>Tvorivá dôveryhodnosť</h3><p>Berlinale · 2× Annecy · MoMA · Forbes 30 pod 30 · 87 ocenení</p></div>
-    <div class="seal"><div class="seal-mark"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#003399" stroke-width="1.5"/><path d="M3 12 L21 12 M12 3 C16 7 16 17 12 21 M12 3 C8 7 8 17 12 21" fill="none" stroke="#003399" stroke-width="1"/></svg></div><h3>Multi-trhová distribúcia</h3><p>USA, UK, DE, KR · Washington Post · Milka · Orange · Jelly NY</p></div>
-    <div class="seal"><div class="seal-mark"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="14" fill="none" stroke="#003399" stroke-width="1.5" rx="1"/><path d="M4 10 L20 10 M9 6 L9 4 L15 4 L15 6" stroke="#003399" stroke-width="1.5"/></svg></div><h3>Medzinárodná štruktúra</h3><p>EE firma + SK kreatívna základňa v Trnave + ~30 freelancerov</p></div>
-    <div class="seal"><div class="seal-mark"><svg viewBox="0 0 24 24"><path d="M12 2 L12 22 M2 12 L22 12 M5 5 L19 19 M5 19 L19 5" stroke="#003399" stroke-width="1.5" opacity=".7"/><circle cx="12" cy="12" r="3" fill="#003399"/></svg></div><h3>Tematický fit 2026 — 27</h3><p>AI v kreatíve · child-safe digital · vzdelávanie · digitálna kultúra</p></div>
-  </div>
-
-  <h2>Kľúčové ukazovatele úspechu štúdia</h2>
-  <ul class="bullet">
-    <li><strong>Tvorivá dôveryhodnosť:</strong> Premiéry na festivale Berlinale, dve ocenenia z Annecy (najväčší festival animácie na svete), prvý slovenský film v zbierke múzea MoMA v New Yorku, semifinále Študentského Oscara, umiestnenie v rebríčku Forbes 30 pod 30 a domáca cena Slnko v sieti. Celkovo štúdio získalo 87 medzinárodných cien.</li>
-    <li><strong>Distribúcia na viacerých trhoch:</strong> Knihy vydané v USA, Veľkej Británii, Nemecku a Južnej Kórei. Kampane pre globálne značky ako Washington Post, Milka, Orange a McDonald's, a zastúpenie britskou agentúrou Jelly New York.</li>
-    <li><strong>Medzinárodná štruktúra:</strong> Estónska spoločnosť kombinovaná so slovenskou tvorivou základňou v Kreatívnom centre v Trnave a tímom približne 30 externistov po celej Európe pracujúcich na diaľku.</li>
-    <li><strong>Silný tematický súlad pre roky 2026 – 2027:</strong> Umelá inteligencia v kreatívnom priemysle, bezpečné digitálne produkty pre deti, medzigeneračné vzdelávanie a digitálna transformácia kultúrneho sektora.</li>
-  </ul>
-
-  <h2>Strategické výhody pre prácu vedúceho tímu</h2>
-  <p>Pre vedúceho grantového tímu znamená tento profil obrovskú výhodu pri obhajovaní projektov pred donormi:</p>
+  <h3>Strategické výhody</h3>
+  <p>Pre vedúceho grantového tímu znamená tento profil potenciálnu výhodu pri obhajovaní projektov pred donormi:</p>
   <ul class="bullet">
     <li><strong>Prístup k viacerým grantovým prostrediam:</strong> Vďaka súbežnému fungovaniu v Estónsku aj na Slovensku môže štúdio žiadať o prostriedky z rôznych národných ekosystémov súčasne a jednoduchšie budovať medzinárodné konzorciá.</li>
-    <li><strong>Aktuálne a žiadané témy:</strong> Štúdio je tematicky zamerané presne na tie oblasti, ktoré majú v Európskej únii pre roky 2026 – 2027 najsilnejšiu politickú a rozpočtovú podporu.</li>
     <li><strong>Existujúce základy projektov:</strong> V každej zo spomínaných oblastí už štúdio disponuje buď hotovým portfóliom, prebiehajúcim výskumom a vývojom, alebo rozpracovanými projektmi naprieč rôznymi médiami.</li>
   </ul>
-  <p>Tento spoločný profil — autorská kvalita, komerčná spoľahlivosť, medzinárodný zásah a technologické zručnosti — výrazne uľahčuje prácu grantového tímu a maximalizuje úspešnosť podávaných žiadostí.</p>
 </article>
-<!-- ============== POZÍCIA / PREDSTAVENIE (home) ============== -->
-<article class="page is-active" data-page="pozicia/predstavenie">
-  <div class="kicker"><span>Pozícia</span><span class="num">· Predstavenie spolupráce</span></div>
-  <h1 class="page-title">Vedúci <em>grantového</em><br>tímu.</h1>
-  <p class="lede">Pozícia vedúceho grantového tímu je špecializovaná riadiaca rola v našom tvorivom štúdiu. Hlavným poslaním je koordinovať prácu desiatich začínajúcich autorov (stážistov) a spoločne s nimi zastrešovať kompletnú prípravu, podávanie a následnú realizáciu medzinárodných aj národných grantových žiadostí. Agenda sa zameriava najmä na európske programy ako Kreatívna Európa, Horizont Európa, Erasmus+ či Medzinárodný vyšehradský fond, v kombinácii s dotačnými schémami na Slovensku, v Estónsku, Česku a Nemecku.</p>
-  <p>Spolupráca je navrhnutá na úvodné obdobie 12 mesiacov s otvorenou perspektívou prechodu do stabilnej, dlhodobej pozície koordinátora financovania alebo vývojového producenta štúdia. Vedúci tímu pracuje v úzkej dennej väzbe s kreatívnym riaditeľom a na špecifických projektoch spolupracuje s externým konzultantom pre európske fondy. Kľúčovou zložkou role je aj metodické riadenie a rozvoj internej infraštruktúry umelej inteligencie a automatizácií. Tie v štúdiu preberajú rutinné monitorovacie a technické úlohy, vďaka čomu sa vedúci so svojím tímom môže plne sústrediť na strategickú, obsahovú a textovú kvalitu pripravovaných žiadostí.</p>
+<!-- ============== NÁPLŇ PRÁCE / PREDSTAVENIE (home) ============== -->
+<article class="page is-active" data-page="naplna/predstavenie" style="--bg:#f6f4ee;--accent:#ff6632;--text:#0a0a0a">
+  <div class="kicker"><span>Náplň práce</span><span class="num">· Predstavenie spolupráce</span></div>
+  <h1 class="page-title">Vedúci<br><em>grantového</em><br>tímu.</h1>
+  <p class="lede"><strong>Pozícia vedúceho grantového tímu je nová, špecializovaná riadiaca rola v našom tvorivom štúdiu. Jej hlavným poslaním bude koordinovať prácu niekoľkých začínajúcich autorov (stážistov) a spoločne s nimi zastrešovať kompletnú prípravu, podávanie a následnú realizáciu medzinárodných aj národných grantových žiadostí. Agenda sa zameriava najmä na európske programy v kombinácii s národnými dotačnými schémami.</strong></p>
+  <p>Spolupráca je navrhnutá na úvodné obdobie 12 mesiacov s otvorenou perspektívou prechodu do stabilnej, dlhodobej pozície koordinátora financovania alebo vývojového producenta štúdia. Vedúci tímu pracuje v úzkej dennej väzbe s kreatívnym riaditeľom a na špecifických projektoch spolupracuje s externým konzultantom pre európske fondy. Kľúčovou zložkou role je aj metodické riadenie a rozvoj internej infraštruktúry s pomocou nástrojov umelej inteligencie a automatizácie. Tie v štúdiu preberajú rutinné monitorovacie a technické úlohy, vďaka čomu sa vedúci so svojím tímom môže plne sústrediť na strategickú, obsahovú a textovú kvalitu pripravovaných žiadostí.</p>
 
   <h2>Základný rámec spolupráce</h2>
   <ul class="bullet">
     <li><strong>Doba trvania:</strong> 12 mesiacov (s cieľom nadviazania dlhodobého partnerstva)</li>
     <li><strong>Flexibilita:</strong> Sloboda miesta pôsobenia (možnosť kompletnej práce na diaľku)</li>
-    <li><strong>Odmena:</strong> 1 000 eur fixná mesačná zložka na faktúru + 1 % úspechový bonus z každého úspešného projektu</li>
+    <li><strong>Odmena:</strong> 300 eur fixná mesačná zložka na faktúru + 1 % úspechový bonus z každého úspešného projektu</li>
   </ul>
 
   <div class="hero-tags">
     <span class="hero-tag">12 mesiacov</span>
     <span class="hero-tag">Remote-friendly</span>
-    <span class="hero-tag alt">1 000 € / mes + 1 % bonus</span>
+    <span class="hero-tag alt">300 € / mes + 1 % bonus</span>
+  </div>
+
+  <h2>Pracovný rozsah a kapacita</h2>
+  <p>Pozícia je projektovo riadená a nemá fixný hodinový rozsah. Pracovné nasadenie kolíše podľa cyklu grantových výziev - v týždňoch pred submission deadlinmi je intenzívnejšie, medzi deadlinmi pokojnejšie. V priemere zodpovedá približne polovičnému úväzku, ale konkrétny týždeň môže byť pokojne 5 hodín aj 40 hodín.</p>
+  <p>Vedúci grantového tímu si svoj čas plánuje sám, podľa stavu portfólia a deadlinov. Pri pokojných týždňoch očakávame minimálne dostupnosť na weekly check-in a riešenie urgentných situácií. Pri peak týždňoch nepredpokladáme viac ako 40 hodín týždenne. Ak by si konkrétna situácia žiadala viac, riešime to spoločne.</p>
+
+  <h2>Štyri prepojené oblasti práce</h2>
+  <p>Práca vedúceho grantového tímu spája štyri navzájom prepojené oblasti, ktoré spolu kopírujú celý životný cyklus grantovej žiadosti - od prvého kontaktu s autorom až po záverečný audit schváleného a vyúčtovaného projektu. Každá z týchto oblastí má vlastný rytmus a vlastné nástroje, no ich kombinácia tvorí jednu kompaktnú rolu.</p>
+
+  <div class="card-grid">
+    <div class="card"><span class="num">01</span><h3>Riadenie tímu, komunikácia a sieťovanie</h3></div>
+    <div class="card"><span class="num">02</span><h3>Práca so žiadosťami a obsahová kvalita</h3></div>
+    <div class="card"><span class="num">03</span><h3>Systémy, umelá inteligencia a dokumentácia</h3></div>
+    <div class="card"><span class="num">04</span><h3>Realizácia, reporting a audit</h3></div>
   </div>
 </article>
 
-<!-- ============== POZÍCIA / PROFIL ============== -->
-<article class="page" data-page="pozicia/profil">
-  <div class="kicker"><span>Pozícia</span><span class="num">· Profil ideálneho kandidáta</span></div>
+<!-- ============== PODMIENKY / PROFIL ============== -->
+<article class="page" data-page="podmienky/profil" style="--bg:#ffffff;--accent:#7d95ff;--text:#0a0a0a">
+  <div class="kicker"><span>Podmienky</span><span class="num">· Profil ideálneho kandidáta</span></div>
   <h1 class="page-title">Profil ideálneho<br><em>kandidáta</em>.</h1>
-  <p class="lede">Tento profil kombinuje hlboké porozumenie európskym politikám s praktickou skúsenosťou z riadenia projektov v akademickom, kultúrnom a mimovládnom sektore. Pozícia je ideálna pre kandidáta, ktorý dokáže spojiť precízny akademický výskum s dynamickým manažmentom ľudí.</p>
-  <p>Táto rola je navrhnutá ako významný kariérny skok najmä pre tri okruhy uchádzačov: pre bývalých úspešných autorov grantov pripravených na okamžitý profesijný rast, pre ambicióznych absolventov v ranej fáze praxe (1–3 roky po škole), ktorým vedenie 10-členného tímu a správa medzinárodnej agendy zásadne zvýši hodnotu na trhu práce, a pre doktorandov hľadajúcich finančnú nezávislosť a prepojenie výskumného zázemia s reálnym riadením projektov.</p>
+  <p class="lede"><strong>Tento profil kombinuje hlboké porozumenie európskym politikám s praktickou skúsenosťou z riadenia projektov v akademickom, kultúrnom a mimovládnom sektore.</strong></p>
 
   <h2>Vzdelanie a profesijné zázemie</h2>
   <ul class="bullet">
-    <li><strong>Akademická úroveň:</strong> Doktorand (študent tretieho stupňa) alebo absolvent doktorandského štúdia. Ideálne odbory sú európske štúdiá, politické vedy, masmediálna komunikácia, mediálne štúdiá, kultúrny manažment alebo projektové riadenie.</li>
-    <li><strong>Medzinárodná skúsenosť:</strong> Preukázateľný výskumný alebo študijný pobyt v zahraničí, účasť na medzinárodných vedeckých konferenciách a prehľad v súčasnej európskej kultúrnej politike.</li>
-    <li><strong>Prax s riadením ľudí a projektov:</strong> Skúsenosť s koordináciou viacodborových projektov, kultúrnych podujatí alebo verejných kampaní. Výhodou je predchádzajúca práca na pozícii projektového manažéra v akademickom prostredí (napríklad na úrovni doktorandských škôl), v kultúrnych inštitúciách, neziskových organizáciách alebo pri organizácii veľkých festivalov.</li>
-    <li><strong>Skúsenosť s financovaním:</strong> Praktická a úspešná osobná skúsenosť s prípravou podkladov, koordináciou, rozpočtovou disciplínou a vyúčtovaním grantov (či už domácich alebo medzinárodných).</li>
+    <li><strong>Akademická úroveň:</strong> Doktorand (študent tretieho stupňa) alebo absolvent vysokej školy. Ideálne odbory sú európske štúdiá, politické vedy, masmediálna komunikácia, mediálne štúdiá, kultúrny manažment alebo projektové riadenie.</li>
+    <li><strong>Medzinárodná skúsenosť:</strong> výskumný alebo študijný pobyt v zahraničí, účasť na medzinárodných vedeckých konferenciách a prehľad v súčasnej európskej grantovej politike.</li>
+    <li><strong>Prax s riadením ľudí a projektov:</strong> Skúsenosť s koordináciou viacodborových projektov, kultúrnych podujatí alebo verejných kampaní. Výhodou je predchádzajúca práca na pozícii projektového manažéra, v kultúrnych inštitúciách, neziskových organizáciách alebo pri organizácii podujatí.</li>
+    <li><strong>Skúsenosť s financovaním:</strong> Praktická a úspešná osobná skúsenosť s prípravou podkladov, koordináciou, rozpočtovou disciplínou a vyúčtovaním domácich alebo medzinárodných grantov.</li>
   </ul>
 
   <h2>Jazykové vybavenie</h2>
   <ul class="bullet">
-    <li><strong>Anglický jazyk:</strong> Úroveň C1 alebo vyššia. Vyžaduje sa plynulé a suverénne používanie jazyka v profesijnom aj akademickom živote — schopnosť čítať zložité regulačné dokumenty Európskej únie, písať odborné texty bez chýb a vnímať jemné významové nuansy.</li>
-    <li><strong>Slovenský jazyk:</strong> Rodný jazyk, podmienka pre bezchybnú písomnú komunikáciu s domácimi fondmi (Audiovizuálny fond, Fond na podporu umenia).</li>
-    <li><strong>Ďalšie jazyky:</strong> Znalosť iného európskeho jazyka (napríklad nemčiny, estónčiny alebo francúzštiny) je veľkou výhodou.</li>
+    <li><strong>Anglický jazyk:</strong> Úroveň C1 alebo vyššia. Vyžaduje sa plynulé používanie jazyka v profesijej oblasti - schopnosť čítať zložité regulačné dokumenty Európskej únie, písať odborné texty bez chýb a vnímať jemné významové nuansy.</li>
+    <li>Znalosť iného európskeho jazyka (napríklad nemčiny či francúzštiny) je veľkou výhodou.</li>
   </ul>
 
   <h2>Odborné a technické zručnosti</h2>
   <ul class="bullet">
-    <li><strong>Pokročilé strategické písanie:</strong> Schopnosť formulovať štruktúrované, presvedčivé a argumentačne silné texty. Skúsenosť s prispôsobovaním štýlu komunikácie — od formálneho úradného jazyka fondov až po neformálnu koordináciu partnerov v medzinárodných združeniach.</li>
+    <li><strong>Pokročilé strategické písanie:</strong> Schopnosť formulovať štruktúrované, presvedčivé a argumentačne silné texty. Skúsenosť s prispôsobovaním štýlu komunikácie - od formálneho úradného jazyka fondov až po neformálnu koordináciu partnerov v medzinárodných združeniach.</li>
     <li><strong>Finančná gramotnosť:</strong> Schopnosť čítať a pripravovať rozpočtové štruktúry, vykonávať percentuálne prepočty, plánovať mzdové náklady a časové harmonogramy čerpania.</li>
-    <li><strong>Digitálna gramotnosť:</strong> Znalosť systémov na správu úloh a projektov (napríklad Notion, Asana, Trello). Schopnosť rýchlo si osvojiť nové organizačné a plánovacie platformy.</li>
-    <li><strong>Vyvážený prístup k umelej inteligencii:</strong> Schopnosť využívať nástroje umelej inteligencie na zefektívnenie rutinných úloh — sumarizáciu dát, prípravu štruktúr či kontrolu zrozumiteľnosti textu, avšak s vysokou mierou kritického myslenia, dôrazom na ochranu autorských práv a s neustálou finálnou autorskou kontrolou.</li>
+    <li><strong>Digitálna gramotnosť:</strong> Znalosť systémov na správu úloh a projektov. Schopnosť rýchlo si osvojiť nové organizačné a plánovacie platformy.</li>
+    <li><strong>Vyvážený prístup k umelej inteligencii:</strong> Schopnosť využívať nástroje umelej inteligencie na zefektívnenie rutinných úloh - sumarizáciu dát, prípravu štruktúr či kontrolu zrozumiteľnosti textu, avšak s vysokou mierou kritického myslenia, dôrazom na ochranu autorských práv a s neustálou finálnou autorskou kontrolou.</li>
   </ul>
 
   <h2>Osobnostné predpoklady</h2>
   <ul class="bullet">
     <li><strong>Prinášanie pokoja do chaosu:</strong> Schopnosť rýchlo si nastaviť systém v informáciách, určiť jasné priority a rozdeliť komplikované projekty na konkrétne, realizovateľné kroky v prostredí, kde prebieha veľa vecí súčasne.</li>
-    <li><strong>Dôraz na detail a presnosť:</strong> Vysoká miera dôslednosti. Schopnosť ustrážiť formálne náležitosti (správne formáty príloh, pravidlá pomenovávania súborov, povinné vyhlásenia), ktoré často rozhodujú o úspechu žiadosti.</li>
+    <li><strong>Dôraz na detail a presnosť:</strong> Vysoká miera dôslednosti. Schopnosť ustrážiť formálne náležitosti ako sú správne formáty príloh, pravidlá pomenovávania súborov, povinné vyhlásenia.</li>
     <li><strong>Dlhodobá vytrvalosť:</strong> Schopnosť pracovať systematicky a bez okamžitej spätnej väzby, keďže proces od podania žiadosti po zverejnenie výsledkov trvá niekoľko mesiacov.</li>
     <li><strong>Vysoká diskrétnosť:</strong> Spoľahlivosť pri práci s neverejnými strategickými informáciami, finančnými dátami partnerov a s materiálmi chránenými autorským právom.</li>
     <li><strong>Empatia a priama komunikácia:</strong> Schopnosť komunikovať s ľuďmi otvorene, citlivo a bez zbytočného stresu, vďaka čomu stážisti dokážu včas pomenovať problémy v textoch a spoločne ich vyriešiť.</li>
   </ul>
-
-  <h2>Čo vedúci grantového tímu nevykonáva (Hranice zodpovednosti)</h2>
-  <p>Tieto hranice sú nastavené ako ochrana vedúceho tímu pred zodpovednosťou, ktorá patrí vedeniu, a zároveň ako ochrana štúdia pred administratívnymi rizikami.</p>
+</article>
+<!-- ============== NÁPLŇ PRÁCE / RIADENIE TÍMU ============== -->
+<article class="page" data-page="naplna/riadenie" style="--bg:#f4f5f7;--accent:#5abc88;--text:#0a0a0a">
+  <div class="kicker"><span>Náplň práce</span><span class="num">· 01 Riadenie tímu</span></div>
+  <h1 class="page-title">Riadenie tímu,<br>komunikácia<br>a <em>sieťovanie</em>.</h1>
+  <p class="lede">Táto oblasť zastrešuje prácu s ľuďmi, plynulú výmenu informácií a reprezentáciu štúdia navonok. Spája plánované stretnutia, asynchrónnu písomnú operatívu a externé budovanie kontaktov.</p>
   <ul class="bullet">
-    <li><strong>Neschvaľuje strategické smerovanie projektov:</strong> Vedúci tímu pripravuje podklady, analýzy výziev a odporúčania, no finálne rozhodnutie o tom, do ktorých programov sa štúdio zapojí, zostáva na kreatívnom riaditeľovi a producentovi.</li>
-    <li><strong>Neodosiela žiadosti úplne samostatne:</strong> Finálnu kontrolu oprávnenosti subjektu a samotné odoslanie žiadosti cez oficiálne európske portály vykonáva kreatívny riaditeľ (najmä z dôvodov overovania kreditov producenta pri špecifických výzvach).</li>
-    <li><strong>Nevedie strategické rokovania s donormi:</strong> Pripravuje materiály, analýzy a zúčastňuje sa na stretnutiach, no komunikáciu na najvyššej strategickej úrovni vedie kreatívny riaditeľ alebo externý konzultant.</li>
-    <li><strong>Neschvaľuje rozpočty s konečnou platnosťou:</strong> Zostavuje návrhy rozpočtov, prepočítava mzdové limity a subdodávky, no konečné schválenie finančného plánu je plne v rukách producenta štúdia.</li>
+    <li><strong>Vedenie a rozvoj autorov žiadostí:</strong> Vedúci tímu riadi tím približne desiatich autorov grantových žiadostí (študentov), prerozdeľuje medzi nich prácu na konkrétnych projektoch podľa ich špecializácie a kapacity, a dohliada na ich osobný rozvoj v role. Postupne im navrhuje portfóliový zámer - kto zastrešuje slovenské fondy, kto balík programu Erasmus+, kto seversko-baltácke schémy - aby tím spoločne pokryl celé spektrum programov, o ktoré sa štúdio uchádza.</li>
+    <li><strong>Komunikačné rituály tímu:</strong> Vedie týždenné spoločné porady tímu (60 minút), kde sa zdieľajú nové výzvy, kontakty na partnerov a poznatky z prebiehajúcich žiadostí. Tieto porady slúžia na prehľad o tom, kto na čom pracuje, čo pomáha zlaďovať tím a podporuje vzájomnú spoluprácu. Raz mesačne má individuálne stretnutie s každým autorom (30-60 minút) zamerané na hĺbkovú spätnú väzbu, kalibráciu smerovania a riešenie prípadných prekážok. V míľnikoch po 3, 6 a 12 mesiacoch sa zúčastňuje hodnotiacich rozhovorov so stážistami a kreatívnym riaditeľom (v trvaní 60 minút).</li>
+    <li><strong>Zaškoľovanie nových členov:</strong> Pri nástupe každého nového autora vedie štruktúrovaný úvodný proces v rozsahu približne štyroch hodín - úvodné stretnutie (90 minút), prevedenie systémami v prvom týždni (60 minút) a tri následné konzultácie počas prvého mesiaca (každá po 30 minút). Pripravuje pre nového člena tímu vstupný balíček, prístupy do systémov a uvádza ho do prvého reálneho projektu pod mentorským dohľadom.</li>
+    <li><strong>Asynchrónne riadenie tímu cez informačný systém:</strong> Cez interný plánovací systém (Notion) každodenne prideľuje úlohy, kontroluje termíny, píše písomnú spätnú väzbu k textovým návrhom autorov a asynchrónne koordinuje pohyb desiatich stážistov. Týždenne prechádza krátke stavové zápisy od každého z nich a tam, kde to situácia vyžaduje, iniciuje krátky 15-minútový hovor.</li>
+    <li><strong>Operatívna tímová komunikácia:</strong> Cez interné komunikačné platformy (Slack) každodenne rieši rýchle otázky autorov, odstraňuje operatívne prekážky pri ich práci a zdieľa dôležité novinky - nové výzvy, zmeny v termínoch, dôležité kontakty od partnerov. Tento kanál drží tím v dennom rytme bez nutnosti zvolávať stretnutia.</li>
+    <li><strong>Písomná komunikácia s inštitúciami a partnermi:</strong> E-mail je hlavným nástrojom pre väčšinu externej komunikácie. Cez neho overuje fakty u administrátorov grantových fondov, rieši bežné otázky o oprávnenosti, komunikuje s partnermi v medzinárodných združeniach medzi koordinačnými stretnutiami a buduje písomnú stopu, ktorá je dôležitá pri prípadných sporoch alebo auditoch.</li>
+    <li><strong>Strategické zosúladenie s vedením:</strong> Raz týždenne (60 minút) má pevne stanovený čas na strategickú koordináciu s kreatívnym riaditeľom - preberajú prehľad a stav celého tímu, riešia naliehavé problémy, výber žiadostí na strategickú kontrolu, schvaľovanie kľúčových rozhodnutí a aktiváciu nových výziev. Mesačne (90 minút) sa zúčastňuje strategického stretnutia s kreatívnym riaditeľom a producentom, kde sa plánujú nové projekty štúdia, určujú priority pri výzvach, vyhodnocuje sa výkon tímu, prebieha hĺbkový pohľad na uplynulý mesiac a optimalizujú sa pracovné postupy s využitím umelej inteligencie. Pred uzávierkou každej žiadosti sa konajú jedno až dve dodatočné stretnutia (15-30 minút) zamerané na finálnu obsahovú kontrolu a súlad so značkou.</li>
+    <li><strong>Krízový manažment a eskalácie:</strong> Rieši problémy, ktoré vznikajú v reálnom čase - chyby v žiadosti tesne pred uzávierkou, výpadky systémov, ochorenie autora pred odoslaním, urgentné požiadavky o objasnenie od hodnotiteľov s krátkou lehotou. Vie rozhodnúť, čo vyriešiť samostatne, čo postúpiť kreatívnemu riaditeľovi a kedy zapojiť externého konzultanta.</li>
   </ul>
 </article>
-<!-- ============== POZÍCIA / NÁPLŇ PRÁCE ============== -->
-<article class="page" data-page="pozicia/naplna">
-  <div class="kicker"><span>Pozícia</span><span class="num">· Náplň práce</span></div>
-  <h1 class="page-title">Štyri prepojené<br><em>oblasti</em> práce.</h1>
-  <p class="lede">Práca vedúceho grantového tímu spája štyri navzájom prepojené oblasti, ktoré spolu kopírujú celý životný cyklus grantovej žiadosti — od prvého kontaktu s autorom až po záverečný audit schváleného projektu. Každá z týchto oblastí má vlastný rytmus a vlastné nástroje, no ich kombinácia tvorí jednu kompaktnú rolu.</p>
 
-  <div class="card-grid">
-    <div class="card"><span class="num">01 · Riadenie tímu</span><h3>Riadenie tímu, komunikácia a sieťovanie</h3><p>Práca s ľuďmi, plynulá výmena informácií a reprezentácia štúdia navonok. Plánované stretnutia, asynchrónna písomná operatíva a externé budovanie kontaktov.</p></div>
-    <div class="card"><span class="num">02 · Žiadosti</span><h3>Práca so žiadosťami a obsahová kvalita</h3><p>Konkrétna odborná činnosť spojená s prípravou projektov od prvotného nápadu až po samotné odoslanie hotovej žiadosti.</p></div>
-    <div class="card"><span class="num">03 · Systémy a AI</span><h3>Systémy, umelá inteligencia a dokumentácia</h3><p>Technicko-procesná vrstva, ktorá buduje inštitucionálnu pamäť štúdia, zjednodušuje prácu a robí celé oddelenie dlhodobo efektívnejším.</p></div>
-    <div class="card"><span class="num">04 · Realizácia</span><h3>Realizácia, reporting a audit</h3><p>Faza po schválení grantu. Dohľad nad správnym čerpaním prostriedkov, plnením projektových cieľov a úspešným uzavretím projektov.</p></div>
-  </div>
-
-  <h2>1. Riadenie tímu, komunikácia a sieťovanie</h2>
-  <p>Táto oblasť zastrešuje prácu s ľuďmi, plynulú výmenu informácií a reprezentáciu štúdia navonok. Spája plánované stretnutia, asynchrónnu písomnú operatívu a externé budovanie kontaktov.</p>
+<!-- ============== NÁPLŇ PRÁCE / PRÁCA SO ŽIADOSŤAMI ============== -->
+<article class="page" data-page="naplna/ziadosti" style="--bg:#fcef8e;--accent:#ff6632;--text:#0a0a0a">
+  <div class="kicker"><span>Náplň práce</span><span class="num">· 02 Práca so žiadosťami</span></div>
+  <h1 class="page-title">Práca so<br><em>žiadosťami</em>.</h1>
+  <p class="lede">Konkrétna odborná činnosť spojená s prípravou projektov od prvotného nápadu až po samotné odoslanie hotovej žiadosti.</p>
   <ul class="bullet">
-    <li><strong>Vedenie a rozvoj autorov žiadostí:</strong> Vedúci tímu riadi tím približne desiatich autorov grantových žiadostí (študentov), prerozdeľuje medzi nich prácu na konkrétnych projektoch podľa ich špecializácie a kapacity, a dohliada na ich osobný rozvoj v role. Postupne im navrhuje portfóliový zámer — kto zastrešuje slovenské fondy, kto balík programu Erasmus+, kto seversko-baltácke schémy — aby tím spoločne pokryl celé spektrum programov, o ktoré sa štúdio uchádza.</li>
-    <li><strong>Komunikačné rituály tímu:</strong> Vedie týždenné spoločné porady tímu (60 minút), kde sa zdieľajú nové výzvy, kontakty na partnerov a poznatky z prebiehajúcich žiadostí. Tieto porady slúžia na prehľad o tom, kto na čom pracuje, čo pomáha zlaďovať tím a podporuje vzájomnú spoluprácu. Raz mesačne má individuálne stretnutie s každým autorom (30–60 minút) zamerané na hĺbkovú spätnú väzbu, kalibráciu smerovania a riešenie prípadných prekážok. V míľnikoch po 3, 6 a 12 mesiacoch sa zúčastňuje hodnotiacich rozhovorov so stážistami a kreatívnym riaditeľom (v trvaní 60 minút).</li>
-    <li><strong>Zaškoľovanie nových členov:</strong> Pri nástupe každého nového autora vedie štruktúrovaný úvodný proces v rozsahu približne štyroch hodín — úvodné stretnutie (90 minút), prevedenie systémami v prvom týždni (60 minút) a tri následné konzultácie počas prvého mesiaca (každá po 30 minút). Pripravuje pre nového člena tímu vstupný balíček, prístupy do systémov a uvádza ho do prvého reálneho projektu pod mentorským dohľadom.</li>
-    <li><strong>Asynchrónne riadenie tímu cez informačný systém:</strong> Cez interný plánovací systém (Notion) každodenne prideľuje úlohy, kontroluje termíny, píše písomnú spätnú väzbu k textovým návrhom autorov a asynchrónne koordinuje pohyb desiatich stážistov. Týždenne prechádza krátke stavové zápisy od každého z nich a tam, kde to situácia vyžaduje, iniciuje krátky 15-minútový hovor.</li>
-    <li><strong>Operatívna tímová komunikácia:</strong> Cez interné komunikačné platformy (Slack) každodenne rieši rýchle otázky autorov, odstraňuje operatívne prekážky pri ich práci a zdieľa dôležité novinky — nové výzvy, zmeny v termínoch, dôležité kontakty od partnerov. Tento kanál drží tím v dennom rytme bez nutnosti zvolávať stretnutia.</li>
-    <li><strong>Písomná komunikácia s inštitúciami a partnermi:</strong> E-mail je hlavným nástrojom pre väčšinu externej komunikácie. Cez neho overuje fakty u administrátorov grantových fondov, rieši bežné otázky o oprávnenosti, komunikuje s partnermi v medzinárodných združeniach medzi koordinačnými stretnutiami a buduje písomnú stopu, ktorá je dôležitá pri prípadných sporoch alebo auditoch.</li>
-    <li><strong>Strategické zosúladenie s vedením:</strong> Raz týždenne (60 minút) má pevne stanovený čas na strategickú koordináciu s kreatívnym riaditeľom — preberajú prehľad a stav celého tímu, riešia naliehavé problémy, výber žiadostí na strategickú kontrolu, schvaľovanie kľúčových rozhodnutí a aktiváciu nových výziev. Mesačne (90 minút) sa zúčastňuje strategického stretnutia s kreatívnym riaditeľom a producentom, kde sa plánujú nové projekty štúdia, určujú priority pri výzvach, vyhodnocuje sa výkon tímu, prebieha hĺbkový pohľad na uplynulý mesiac a optimalizujú sa pracovné postupy s využitím umelej inteligencie. Pred uzávierkou každej žiadosti sa konajú jedno až dve dodatočné stretnutia (15–30 minút) zamerané na finálnu obsahovú kontrolu a súlad so značkou.</li>
-    <li><strong>Krízový manažment a eskalácie:</strong> Rieši problémy, ktoré vznikajú v reálnom čase — chyby v žiadosti tesne pred uzávierkou, výpadky systémov, ochorenie autora pred odoslaním, urgentné požiadavky o objasnenie od hodnotiteľov s krátkou lehotou. Vie rozhodnúť, čo vyriešiť samostatne, čo postúpiť kreatívnemu riaditeľovi a kedy zapojiť externého konzultanta.</li>
-    <li><strong>Sieťovanie a budovanie ekosystému:</strong> Reprezentuje štúdio na informačných dňoch programov (Kreatívna Európa, Horizont Európa, Erasmus+ a ďalších), či už osobne alebo na webinároch. Buduje funkčné vzťahy s administrátormi grantových fondov, kontakty s kolegami-koordinátormi z iných štúdií (odhadom 2–3 kolegiálne stretnutia ročne) a postupne tvorí sieť, ktorá je dlhodobou hodnotou pre štúdio aj pre neho osobne.</li>
-  </ul>
-
-  <h2>2. Práca so žiadosťami a obsahová kvalita</h2>
-  <p>Konkrétna odborná činnosť spojená s prípravou projektov od prvotného nápadu až po samotné odoslanie hotovej žiadosti.</p>
-  <ul class="bullet">
-    <li><strong>Sledovanie a vyhodnocovanie výziev:</strong> Pravidelne monitoruje domáce a európske grantové prostredie cez automatizované nástroje (odbery noviniek, e-mailové notifikácie z 15–20 oficiálnych zdrojov), výstupy umelej inteligencie (týždenný prehľad z interného asistenta Claude) a vlastné štúdium nových dokumentov k výzvam. Každú novú výzvu posudzuje voči strategickému plánu štúdia a navrhuje kreatívnemu riaditeľovi, ktoré sa majú aktivovať do prípravy.</li>
-    <li><strong>Spätné prepojenie projektov s výzvami:</strong> Pri každom novom projekte štúdia pripravuje štruktúrovaný prehľad všetkých grantových programov, do ktorých by projekt mohol potenciálne zapadnúť. Vychádza pritom z metódy hlavného konceptu, kde sa jeden silný projekt adaptuje do 3–5 výziev so zlomkom dodatočného úsilia. Tento prehľad slúži ako podklad pre spoločné rozhodovanie s kreatívnym riaditeľom a producentom o tom, ktoré grantové cesty sa aktivujú.</li>
+    <li><strong>Sledovanie a vyhodnocovanie výziev:</strong> Pravidelne monitoruje domáce a európske grantové prostredie cez automatizované nástroje (odbery noviniek, e-mailové notifikácie z 15-20 oficiálnych zdrojov), výstupy umelej inteligencie (týždenný prehľad z interného asistenta Claude) a vlastné štúdium nových dokumentov k výzvam. Každú novú výzvu posudzuje voči strategickému plánu štúdia a navrhuje kreatívnemu riaditeľovi, ktoré sa majú aktivovať do prípravy.</li>
+    <li><strong>Spätné prepojenie projektov s výzvami:</strong> Pri každom novom projekte štúdia pripravuje štruktúrovaný prehľad všetkých grantových programov, do ktorých by projekt mohol potenciálne zapadnúť. Vychádza pritom z metódy hlavného konceptu, kde sa jeden silný projekt adaptuje do 3-5 výziev so zlomkom dodatočného úsilia. Tento prehľad slúži ako podklad pre spoločné rozhodovanie s kreatívnym riaditeľom a producentom o tom, ktoré grantové cesty sa aktivujú.</li>
     <li><strong>Kontrola kvality a úprava textov:</strong> Podrobne reviduje textové návrhy od autorov ešte predtým, než idú k finálnemu strategickému schváleniu kreatívnym riaditeľom. Kontroluje súlad s podmienkami výzvy, vnútornú logiku jednotlivých sekcií, jazykovú úroveň anglického textu, štylistickú konzistenciu a kompletnosť príloh. Pri textoch generovaných umelou inteligenciou dbá na to, aby finálna verzia pôsobila ako autorská strategická práca, nie ako šablónovitý výstup.</li>
-    <li><strong>Koordinácia s partnermi v medzinárodných združeniach:</strong> Pri projektoch s viacerými účastníkmi (Erasmus+, Kreatívna Európa, Horizont Európa) vedie operatívnu komunikáciu s partnermi. Na začiatku prípravy spoločnej žiadosti zvoláva úvodné stretnutie všetkých partnerov (60–90 minút). Vo fáze písania (4–6 týždňov pred uzávierkou) vedie pravidelné koordinačné stretnutia približne raz za dva týždne. V období tesne pred uzávierkou organizuje dvojstranné stretnutia s jednotlivými partnermi na zosúladenie pracovných balíkov, rozpočtu a obsahu textu, pričom v špičke ide o <em>2 až 5 stretnutí týždenne</em>.</li>
-    <li><strong>Koordinácia s externými konzultantmi:</strong> Pri najkomplexnejších výzvach (Horizont Európa, projekty spolupráce Kreatívnej Európy, prvé podanie v programe MEDIA) riadi spoluprácu s externými odborníkmi na európske financovanie — pripravuje pre nich podklady, vedie týždenné prehľadové stretnutia a integruje ich pripomienky do textu žiadosti. Súbežne môže riadiť 1–3 takéto konzultačné vzťahy.</li>
-    <li><strong>Inštitucionálna pamäť o poskytovateľoch:</strong> Systematicky zaznamenáva každú komunikáciu s administrátormi a poverenými zástupcami fondov do interného systému — kontext rozhovorov, ich preferencie, predošlé otázky a odpovede, neformálne pripomienky, ktoré padli pri konzultáciách. Vyšším stupňom tejto komunikácie sú výnimočné telefonáty a online stretnutia s administrátormi slovenského, estónskeho a nemeckého zastúpenia programu Kreatívna Európa, agentúry EACEA, domáceho Audiovizuálneho fondu, Fondu na podporu umenia, Estónskeho filmového inštitútu, Vyšehradského fondu, agentúr Erasmus+ (SAAIC, Archimedes), Severského kultúrneho bodu a súkromných nadácií ako Robert Bosch Stiftung. Táto pamäť robí každú nasledujúcu žiadosť silnejšou.</li>
+    <li><strong>Koordinácia s partnermi v medzinárodných združeniach:</strong> Pri projektoch s viacerými účastníkmi (Erasmus+, Kreatívna Európa, Horizont Európa) vedie operatívnu komunikáciu s partnermi. Na začiatku prípravy spoločnej žiadosti zvoláva úvodné stretnutie všetkých partnerov (60-90 minút). Vo fáze písania (4-6 týždňov pred uzávierkou) vedie pravidelné koordinačné stretnutia približne raz za dva týždne. V období tesne pred uzávierkou organizuje dvojstranné stretnutia s jednotlivými partnermi na zosúladenie pracovných balíkov, rozpočtu a obsahu textu.</li>
+    <li><strong>Koordinácia s externými konzultantmi:</strong> Pri najkomplexnejších výzvach riadi spoluprácu s externými odborníkmi na európske financovanie - pripravuje pre nich podklady, vedie týždenné prehľadové stretnutia a integruje ich pripomienky do textu žiadosti. Súbežne môže riadiť 1-3 takéto konzultačné vzťahy.</li>
     <li><strong>Komunikácia s hodnotiteľmi pri objasňovani žiadostí:</strong> Ak hodnotitelia počas posudzovania požiadajú o objasnenie detailov žiadosti, ide o zriedkavé, ale kľúčové situácie s lehotou na odpoveď do 10 dní. V tejto komunikácii má hlavné slovo kreatívny riaditeľ, no Team Lead pripravuje podklady, zúčastňuje sa stretnutí a koordinuje finálnu písomnú odpoveď. Pri vyjednávaní o samotnej grantovej dohode po schválení rovnako pripravuje podklady a asistuje, vyjednávanie vedie kreatívny riaditeľ.</li>
-    <li><strong>Záverečná kontrola splnenia podmienok:</strong> Pred každým podaním vykonáva kompletnú kontrolu súladu s predpismi — formát príloh, pravidlá pomenovávania súborov, technické podmienky oprávnenosti a kompletnosť povinných dokumentov. Po schválení kreatívnym riaditeľom realizuje finálne odoslanie žiadosti cez Európsky portál pre financovanie a verejné obstarávanie, národné elektronické dotačné systémy, alebo fyzickou formou (pri AVF, FPU a niektorých českých schémach), vrátane tlače, podpisu a odoslania.</li>
   </ul>
 
   <h2>Záverečná kontrola a koordinácia podania žiadostí</h2>
   <p>Proces finálnej kontroly a samotného odoslania je v štúdiu jasne štruktúrovaný a rozdelený podľa úrovne zodpovednosti, čo chráni projekty pred formálnymi a administratívnymi chybami:</p>
   <ul class="bullet">
     <li><strong>Autori žiadostí (stážisti):</strong> Zodpovedajú za prípravu textových podkladov a tabuliek. Do samotných dotačných portálov a oficiálnych štátnych či európskych systémov vôbec nevstupujú.</li>
-    <li><strong>Vedúci grantového tímu (Team Lead):</strong> Pôsobí ako hlavný operátor všetkých dotačných systémov. Pred každým odoslaním vykonáva kompletnú kontrolu súladu s predpismi — preveruje formáty príloh, pravidlá pomenovávania súborov, technické podmienky oprávnenosti a kompletnosť povinných dokumentov. Nahráva podklady do portálov (Európsky portál pre financovanie a verejné obstarávanie, národné elektronické dotačné systémy) a kompletizuje formuláre.</li>
-    <li><strong>Kreatívny riaditeľ:</strong> Vykonáva záverečné schválenie. Samotný akt finálneho podania — kliknutie na tlačidlo odoslania v elektronických systémoch a vlastnoručný podpis papierových formulárov — realizuje kreatívny riaditeľ z dôvodov overovania zmluvnej oprávnenosti a producentských kreditov, najmä pri filmových programoch.</li>
-    <li><strong>Logistická podpora na Slovensku:</strong> Pri fondoch, ktoré vyžadujú podanie poštou (Audiovizuálny fond, Fond na podporu umenia), zabezpečuje fyzickú tlač, kompletizáciu a podanie na poštu produkčný tím priamo na Slovensku. Vedúci tímu celú túto logistiku koordinuje na diaľku.</li>
+    <li><strong>Vedúci grantového tímu (Team Lead):</strong> Pôsobí ako hlavný operátor všetkých dotačných systémov. Pred každým odoslaním vykonáva kompletnú kontrolu súladu s predpismi - preveruje formáty príloh, pravidlá pomenovávania súborov, technické podmienky oprávnenosti a kompletnosť povinných dokumentov. Nahráva podklady do portálov (Európsky portál pre financovanie a verejné obstarávanie, národné elektronické dotačné systémy) a kompletizuje formuláre.</li>
+    <li><strong>Kreatívny riaditeľ:</strong> Vykonáva záverečné schválenie. Samotný akt finálneho podania - kliknutie na tlačidlo odoslania v elektronických systémoch a vlastnoručný podpis papierových formulárov - realizuje kreatívny riaditeľ z dôvodov overovania zmluvnej oprávnenosti.</li>
+    <li><strong>Logistická podpora na Slovensku:</strong> Pri fondoch, ktoré vyžadujú podanie poštou (Audiovizuálny fond, Fond na podporu umenia), zabezpečuje fyzickú tlač, kompletizáciu a podanie na poštu produkčný tím. Vedúci tímu celú túto logistiku koordinuje na diaľku.</li>
   </ul>
   <p>Po úspešnom odoslaní vedúci grantového tímu zaznamená potvrdzujúce číslo o odoslaní a bezpečne archivuje oficiálnu doručenku v databáze žiadostí v systéme Notion.</p>
+</article>
 
-  <h2>3. Systémy, umelá inteligencia a dokumentácia</h2>
-  <p>Technicko-procesná vrstva, ktorá buduje inštitucionálnu pamäť štúdia, zjednodušuje prácu a robí celé oddelenie dlhodobo efektívnejším.</p>
+<!-- ============== NÁPLŇ PRÁCE / SYSTÉMY, AI A DOKUMENTÁCIA ============== -->
+<article class="page is-dark" data-page="naplna/systemy-ai" style="--bg:#2a1b36;--accent:#e2dc00;--text:#f6f4ee">
+  <div class="kicker"><span>Náplň práce</span><span class="num">· 03 Systémy, AI a dokumentácia</span></div>
+  <h1 class="page-title">Systémy,<br>AI a<br><em>dokumentácia</em>.</h1>
+  <p class="lede">Technicko-procesná vrstva, ktorá buduje inštitucionálnu pamäť štúdia, zjednodušuje prácu a robí celé oddelenie dlhodobo efektívnejším.</p>
   <ul class="bullet">
-    <li><strong>Riadenie infraštruktúry umelej inteligencie:</strong> Vyvíja, testuje a spravuje inštrukcie pre modely umelej inteligencie, ktoré tím využíva pri sledovaní výziev, analýze dokumentov, písaní prvých návrhov a kontrole formálnych náležitostí. Optimalizuje pracovné toky v nástrojoch Claude, n8n, Notion a Lovable, dolaďuje zadania na základe reálnej skúsenosti z prvých žiadostí a sleduje vývoj nástrojov tak, aby tím vždy pracoval s najefektívnejšou kombináciou.</li>
-    <li><strong>Správa znalostí a trvalá dokumentácia:</strong> Buduje a udržiava internú knižnicu vzorových žiadostí, šablón pre opakujúce sa sekcie, prípadových štúdií úspešných projektov, jazykových profilov pre rôznych poskytovateľov a príručiek pre dodržiavanie tónu komunikácie. Táto trvalá dokumentácia je dlhodobým kapitálom štúdia, ktorý znižuje čas potrebný na prípravu každej ďalšej žiadosti.</li>
-    <li><strong>Riadenie hlavných konceptov:</strong> Spravuje komplexné zdrojové dokumenty pre osem kľúčových projektov štúdia. Každý takýto dokument obsahuje technické, pedagogické aj kreatívne aspekty projektu a slúži ako východisko pre modulárne úpravy do konkrétnych výziev. Vedúci tímu dohliada na to, aby boli tieto hlavné koncepty vždy aktuálne, vnútorne konzistentné a pripravené na okamžité použitie.</li>
-    <li><strong>Prehľady a evidencia:</strong> Pravidelne pripravuje pre kreatívneho riaditeľa a producenta mesačný strategický prehľad o stave celej grantovej agendy — zásobník rozpracovaných žiadostí, schválenia, zamietnutia, finančný objem a výhľad na ďalší štvrťrok. Súčasťou evidencie je aj presné sledovanie podielov jednotlivých autorov na konkrétnych žiadostiach, ktoré je podkladom pre férové vyplácanie ich bonusov.</li>
-  </ul>
-
-  <h2>4. Realizácia, reporting a audit</h2>
-  <p>Táto faza nastáva po schválení grantu. Zahŕňa dohľad nad správnym čerpaním prostriedkov, plnením projektových cieľov a úspešným uzavretím projektov.</p>
-  <ul class="bullet">
-    <li><strong>Dohľad nad plnením podmienok:</strong> Po podpise grantovej dohody kontroluje, či projekt prebieha v súlade s pravidlami poskytovateľa — či výstupy nesú povinné logo európskeho financovania, či sa dodržiavajú termíny merateľných výsledkov a či sa zbierajú potrebné dôkazy o propagácii (snímky obrazovky, fotodokumentácia, zoznamy účastníkov, mediálne ohlasy). Pri spoločných medzinárodných projektoch spája výstupy partnerov do jednotného formátu.</li>
-    <li><strong>Koordinačné stretnutia s partnermi počas realizácie:</strong> Počas implementácie schváleného projektu vedie mesačné stretnutia partnerov (60–90 minút), zamerané na kontrolu plánovaných výstupov, podávanie priebežných správ a operatívne riešenie odchýlok od plánu.</li>
-    <li><strong>Príprava priebežných a záverečných správ:</strong> Pre každý bežiaci grant pripravuje vecnú a administratívnu časť priebežných a záverečných správ podľa štruktúry požadovanej poskytovateľom. Pred samotným podaním organizuje jedno alebo viacero stretnutí na koordináciu správy. Spolupracuje pri tom s autorom, ktorý projekt pôvodne pripravoval, s producentom a s externým účtovníkom, ktorý dodáva finančné výkazy. Sleduje termíny vykazovania a zabezpečuje, aby žiadny míľnik nebol oneskorený.</li>
-    <li><strong>Spolupráca s finančným oddelením a audítormi:</strong> Štvrťročne sa stretáva s externým účtovníkom pri každom bežiacom grante — prechádzajú finančné výkazy, kategorizáciu výdavkov podľa pracovných balíkov a daňové aspekty. Pri grantoch, ktoré prekročia stanovený finančný limit (typicky 325 000 € pri programe Horizont Európa alebo veľkých výzvach MEDIA), pripravuje sériu konzultácií s externým certifikovaným audítorom pred vydaním povinného audítorského certifikátu.</li>
-    <li><strong>Správa dokumentácie pre kontrolu:</strong> Udržiava všetky projektové spisy v stave okamžite pripravenom na kontrolu zo strany poskytovateľa grantu — zazmluvnené dokumenty, faktúry, výkazy práce, kontrakty s dodávateľmi, evidencia výstupov a fotodokumentácia. Štruktúra zložiek presne zodpovedá požiadavkám audítorov, čo znamená, že prípadná kontrola môže prebehnúť kedykoľvek bez dodatočnej prípravy.</li>
+    <li><strong>Správa a optimalizácia systémov umelej inteligencie:</strong> Technické zázemie, automatizovaných asistentov, inštrukcie pre modely a prepojenia systémov pripravuje pre grantovú agendu vopred administratívny tím v spolupráci s kreatívnym riaditeľom. Vedúci tímu túto existujúcu infraštruktúru preberá do správy. Dohliada na jej správne využívanie pri sledovaní výziev, analýze dokumentov či kontrole textov stážistami. Na základe reálnych skúseností z praxe následne navrhuje administratívnemu tímu drobné úpravy a vylepšenia v nástrojoch Claude, n8n, Notion a Lovable, aby kombinácia nástrojov zostala pre tím čo najužitočnejšia.</li>
+    <li><strong>Správa znalostí a trvalá dokumentácia:</strong> Udržiava a systematicky dopĺňa internú knižnicu vzorových žiadostí, šablón pre opakujúce sa sekcie, prípadových štúdií úspešných projektov a príručiek pre dodržiavanie správneho tónu komunikácie. Táto trvalá dokumentácia chráni spoločné know-how štúdia a priebežne znižuje čas potrebný na prípravu nových žiadostí.</li>
+    <li><strong>Riadenie hlavných konceptov:</strong> Zastrešuje komplexné zdrojové dokumenty pre kľúčové projekty štúdia. Každý takýto dokument spája technické, pedagogické a tvorivé aspekty projektov a slúži ako spoločné východisko pre ich úpravy do konkrétnych výziev. Vedúci tímu dbá na to, aby boli tieto hlavné koncepty priebežne aktualizované o nové poznatky a pripravené na použitie.</li>
+    <li><strong>Prehľady a evidencia:</strong> Pravidelne pripravuje pre štúdio mesačný strategický prehľad o stave celej grantovej agendy (zásobník rozpracovaných žiadostí, schválenia, zamietnutia, finančný objem a výhľad na ďalší štvrťrok). Súčasťou evidencie je aj presné sledovanie podielov jednotlivých autorov na konkrétnych žiadostiach, ktoré slúži ako podklad pre spravodlivé vyplácanie ich úspechových odmien.</li>
   </ul>
 </article>
 
-<!-- ============== POZÍCIA / PO SCHVÁLENÍ ============== -->
-<article class="page" data-page="pozicia/po-schvaleni">
-  <div class="kicker"><span>Pozícia</span><span class="num">· Práca po schválení grantu</span></div>
-  <h1 class="page-title">Realizácia,<br><em>vykazovanie</em> a audit.</h1>
-  <p class="lede">Po podpise grantovej dohody sa otvára dôležitá fáza práce, ktorá trvá 12 až 48 mesiacov podľa konkrétneho programu. Zahŕňa implementáciu projektu, finančné riadenie, administratívu, vyúčtovanie a komunikáciu s poskytovateľom podpory. Táto agenda vyžaduje spoluprácu piatich rolí v štúdiu: vedúceho tímu, kreatívneho riaditeľa, producenta, externého účtovníka a projektového manažéra štúdia.</p>
-  <p>Pri 5 až 10 súbežne bežiacich grantoch spočíva hlavná úloha vedúceho tímu v koordinácii, dohľade nad kvalitou a riadení prípadných rizík.</p>
+<!-- ============== NÁPLŇ PRÁCE / REALIZÁCIA ============== -->
+<article class="page" data-page="naplna/realizacia" style="--bg:#e5cac7;--accent:#673ab7;--text:#0a0a0a">
+  <div class="kicker"><span>Náplň práce</span><span class="num">· 04 Realizácia, reporting a audit</span></div>
+  <h1 class="page-title">Realizácia,<br>reporting<br>a <em>audit</em>.</h1>
+  <p class="lede"><strong>Vedúci tímu dbá na to, aby bolo štúdio v súlade s požiadavkami poskytovateľov a aby bol každý schválený grant správne zdokumentovaný, vyúčtovaný a bezpečne uzavretý.</strong></p>
+  <p>Táto fáza nastáva po schválení grantu a podpisov zmlúv. Ide o dôležité obdobie, ktoré trvá 12 až 48 mesiacov podľa konkrétneho programu. Zahŕňa implementáciu projektu, finančné riadenie, administratívu, vyúčtovanie a komunikáciu s poskytovateľom podpory. Táto agenda vyžaduje koordinovanú súčinnosť piatich rolí v štúdiu: vedúceho tímu, kreatívneho riaditeľa, producenta, externého účtovníka a projektového manažéra štúdia.</p>
+  <p>Pri 5 až 10 súbežne bežiacich grantoch spočíva hlavná úloha vedúceho tímu v celkovej koordinácii (orchestrácii), dohľade nad kvalitou a riadení portfóliových rizík.</p>
 
   <h2>Zodpovednosti vedúceho tímu v realizačnej fáze</h2>
   <ul class="bullet">
-    <li><strong>Úvodné stretnutie k realizácii:</strong> Pri každom schválenom grante vedúci tímu zvoláva stretnutie za účasti kreatívneho riaditeľa, autora žiadosti, projektového manažéra štúdia a externého účtovníka. Nastavia sa tu zodpovednosti, termíny správ, plánované výstupy a rytmus mesačných kontrol. Vedúci tímu pripravuje program stretnutia a zaznamenáva rozhodnutia do systému Notion.</li>
-    <li><strong>Pridelenie každodennej agendy:</strong> Po úvodnom stretnutí preberá bežnú prevádzkovú agendu konkrétny autor žiadosti (pre zachovanie continuity s projektom). Zabezpečuje dokumentáciu, evidenciu propagácie a návrhy správ, zatiaľ čo vedúci tímu vykonáva len priebežný dohľad.</li>
-    <li><strong>Kontrola kvality predložených správ:</strong> Každá priebežná a záverečná správa pripravená autorom prechádza prvou kontrolou u vedúceho tímu. Ten preveruje logiku textu, súlad s plánom, úroveň jazyka a v spolupráci s účtovníkom kontroluje úplnosť finančných údajov a dôkazov o realizácii ešte pred schválením u kreatívneho riaditeľa.</li>
+    <li><strong>Úvodné stretnutie k realizácii (Kick-off):</strong> Pri každom schválenom grante vedúci tímu zvoláva stretnutie za účasti kreatívneho riaditeľa, autora žiadosti (stážistu), projektového manažéra štúdia a externého účtovníka. Na tomto stretnutí sa stanovia zodpovednosti, termíny správ, plánované výstupy a rytmus mesačných kontrol. Vedúci tímu pripravuje program stretnutia a zaznamenáva rozhodnutia do systému Notion.</li>
+    <li><strong>Pridelenie každodennej agendy:</strong> Po úvodnom stretnutí preberá bežnú prevádzkovú agendu konkrétny autor žiadosti, ktorý projekt pôvodne pripravoval (pre zachovanie kontinuity). Zabezpečuje bežnú dokumentáciu, evidenciu propagácie a návrhy správ, zatiaľ čo vedúci tímu vykonáva priebežný dohľad.</li>
+    <li><strong>Dohľad nad plnením podmienok a publicitou:</strong> Kontroluje, či projekt prebieha v súlade s pravidlami poskytovateľa - či výstupy nesú povinné logo európskeho financovania, či sa dodržiavajú termíny merateľných výsledkov a či sa priebežne zbierajú potrebné dôkazy o propagácii (snímky obrazovky, fotodokumentácia, zoznamy účastníkov, mediálne ohlasy).</li>
     <li><strong>Správa spoločného kalendára výkazov:</strong> V systéme Notion vedúci tímu udržiava jednotný kalendár termínov pre všetky bežiace projekty (priebežné správy, finančné výkazy, audity). Týždenne ho kontroluje a 4 až 6 týždňov pred uzávierkou aktivuje prácu autora, účtovníka a medzinárodných partnerov.</li>
-    <li><strong>Komunikácia s projektovými manažérmi fondov:</strong> Pôsobí ako primárny kontakt pre prideleného úradníka fondu (pri programoch Kreatívna Európa, Horizont Európa a iných). Absolvuje s ním pravidelné koordinačné hovory a posiela aktualizácie. Strategické zmeny rozsahu či rozpočtu vopred pripravuje, no finálne slovo má kreatívny riaditeľ.</li>
-    <li><strong>Koordinácia medzinárodných partnerov:</strong> Pri projektoch s viacerými účastníkmi (Erasmus+, Kreatívna Európa, Horizont Európa) vedie mesačné koordinačné stretnutia partnerov v rozsahu 60–90 minút. Spája ich podklady do jednotnej správy pre poskytovateľa, rieši drobné odchýlky a vážnejšie problémy posúva kreatívnemu riaditeľovi.</li>
+    <li><strong>Príprava a kontrola kvality správ:</strong> Pre každý grant zastrešuje vecnú a administratívnu časť priebežných a záverečných správ. Každý draft pripravený autorom prechádza jeho prvou kontrolou. Preveruje vnútornú logiku textu, súlad s deliverables, úroveň anglického jazyka, štylistickú konzistenciu a kompletnosť príloh ešte pred tým, než ide materiál na stôl kreatívnemu riaditeľovi.</li>
+    <li><strong>Komunikácia s projektovými manažérmi fondov:</strong> Pôsobí ako primárny operatívny kontakt pre prideleného úradníka fondu (pri programoch Kreatívna Európa, Horizont Európa a iných). Absolvuje s ním pravidelné koordinačné hovory a posiela aktualizácie. Strategické zmeny rozsahu či rozpočtu vopred pripravuje, no finálne slovo má kreatívny riaditeľ.</li>
+    <li><strong>Koordinácia medzinárodných partnerov:</strong> Pri projektoch s viacerými účastníkmi (Erasmus+, Kreatívna Európa, Horizont Európa) vedie mesačné koordinačné stretnutia partnerov v rozsahu 60-90 minút. Spája ich podklady a výstupy do jednotného formátu pre poskytovateľa, rieši drobné odchýlky a vážnejšie problémy posúva kreatívnemu riaditeľovi.</li>
     <li><strong>Príprava oficiálnych žiadostí o zmeny:</strong> Ak projekt vyžaduje formálnu zmenu (predĺženie obdobia, výmena partnera, presuny v rozpočte nad povolený limit), vedúci tímu pripravuje kompletné podklady vrátane zdôvodnenia a finančných či právnych dopadov. Finálne podanie zmeny realizuje kreatívny riaditeľ.</li>
-    <li><strong>Spolupráca s externým účtovníkom:</strong> Komunikácia prebieha štvrťročne pri každom bežiacom grante. Prechádzajú sa finančné výkazy, zaraďovanie výdavkov k pracovným balíkom a daňové aspekty medzinárodných platieb. Účtovník dodáva finančnú časť a vedúci tímu obsahovú časť tak, aby tvorili jednotný celok.</li>
-    <li><strong>Príprava podkladov na nezávislé audity:</strong> Pri projektoch nad stanovený finančný limit (zvyčajne 325 000 eur pri programe Horizont Európa alebo veľkých výzvach MEDIA) pripravuje kompletný spis (zmluvy, faktúry, výkazy práce, dodávateľské kontrakty, fotodokumentáciu) a vedie konzultácie s certifikovaným audítorom pred vydaním osvedčenia.</li>
-    <li><strong>Sledovanie rizika spätného vymáhania prostriedkov:</strong> Poskytovateľ môže skontrolovať a žiadať vrátenie časti peňazí aj 2 roky po skončení projektu. Vedúci tímu preto udržiava register rizík pre všetky fázy projektov (realizačnú, vykazovaciu, audítorskú i uzatvorenú) a mesačne o stave informuje kreatívneho riaditeľa a producenta.</li>
+    <li><strong>Spolupráca s externým účtovníkom:</strong> Komunikácia prebieha štvrťročne pri každom bežiacom grante - prechádzajú sa finančné výkazy, kategorizácia výdavkov podľa pracovných balíkov a daňové aspekty medzinárodných platieb. Účtovník dodáva finančnú časť a vedúci tímu obsahovú časť tak, aby tvorili jeden koherentný celok.</li>
+    <li><strong>Príprava podkladov na nezávislé audity:</strong> Pri grantoch nad stanovený finančný limit (typicky 325 000 € pri programe Horizont Európa alebo veľkých výzvach MEDIA) pripravuje kompletný spis a vedie sériu konzultácií s externým certifikovaným audítorom pred vydaním povinného audítorského certifikátu.</li>
+    <li><strong>Udržiavanie dokumentácie v stave "Audit-Ready":</strong> Dbá na to, aby boli všetky projektové spisy kedykoľvek pripravené na kontrolu zo strany poskytovateľa - zazmluvnené dokumenty, faktúry, výkazy práce, kontrakty s dodávateľmi, evidencia výstupov a fotodokumentácia. Štruktúra zložiek presne zodpovedá požiadavkám audítorov.</li>
+    <li><strong>Sledovanie rizika spätného vymáhania (Reclaim):</strong> Poskytovateľ môže žiadať vrátenie časti peňazí aj 2 roky po skončení projektu (najmä pri Horizon Europe a Cooperation Projects). Vedúci tímu preto udržiava register rizík pre všetky fázy projektov (realizačnú, vykazovaciu, audítorskú i uzatvorenú) a mesačne o stave informuje kreatívneho riaditeľa a producenta.</li>
   </ul>
 
-  <h2>Hranice zodpovednosti (Čo vedúci tímu nevykonáva)</h2>
-  <p>Tieto pravidlá jasne ohraničujú rolu a chránia vedúceho tímu pred úlohami, na ktoré nemá mandát.</p>
-  <ul class="bullet">
-    <li><strong>Nerieši účtovníctvo:</strong> Zapisovanie faktúr a platieb do účtovného systému, spracovanie DPH, dane zo zahraničných platieb a formátovanie finančných výkazov sú výhradnou prácou externého účtovníka.</li>
-    <li><strong>Neschvaľuje platby:</strong> Schvaľovanie jednotlivých faktúr, platieb externistom a dodávateľom, autorizácia bankových prevodov a rozhodovanie o presunoch rozpočtu sú v kompetencii kreatívneho riaditeľa a producenta.</li>
-    <li><strong>Neriadi strategické spory:</strong> Vedenie zásadných vyjednávaní s partnermi pri konfliktoch, podpisovanie formálnych výstupov pre fondy a vystupovanie v pozícii hlavného zmluvného partnera prislúcha kreatívnemu riaditeľovi.</li>
-    <li><strong>Nahrádza projektového manažéra štúdia:</strong> Vystavovanie zmlúv pre externistov, komunikácia o platbách s tímom, nákup softvéru a stráženie produkčných termínov sú prácou projektového manažéra štúdia. Zatiaľ čo on riadi projekt smerom dovnútra (k produkcii a tímu), vedúci grantového tímu ho riadi smerom navonok (k poskytovateľovi a súladu s predpismi).</li>
-  </ul>
-
-  <h2>Základný princíp a ekonomické prepojenie</h2>
-  <p>Vedúci tímu je špecialistom na grantové procesy a pravidlá. Dbá na to, aby bolo štúdio v súlade s požiadavkami poskytovateľov a aby bol každý schválený grant správne zdokumentovaný, vyúčtovaný a bezpečne uzavretý. Táto portfóliová skúsenosť buduje vysoko cenenú odbornú kompetenciu v oblasti európskeho financovania.</p>
-  <div class="callout"><div class="ck">Motivačné prepojenie</div><p>Táto zodpovednosť je priamo prepojená s motivačným systémom. Z úspechovej odmeny vo výške 1 % zo všetkých schválených grantov celého tímu sa 20 % vypláca až po úspešnom ukončení záverečného auditu. Vedúci tímu má preto osobný záujem na tom, aby projekty prebehli administratívne čisto, bez chýb a bez rizika dodatočného vracania finančných prostriedkov. Register rizík sa tak stáva dôležitým nástrojom, ktorý chráni výsledky práce celého štúdia.</p></div>
-</article>
-<!-- ============== SYSTÉMY / NÁSTROJE ============== -->
-<article class="page" data-page="systemy/nastroje">
-  <div class="kicker"><span>Systémy</span><span class="num">· Nástroje a systémy</span></div>
-  <h1 class="page-title">Nástroje<br>a <em>systémy</em>.</h1>
-  <p class="lede">Úvodné dva týždne spolupráce slúžia na postupné predstavenie softvérového vybavenia a systémov, s ktorými štúdio pracuje. Cieľom nie je jednorazové zahltenie — zoznam odráža aktuálne technologické zázemie, ktoré sa neustále vyvíja. Niektoré nástroje sa využívajú na každodennej báze od prvého dňa, iné sa zapájajú až podľa reálnej potreby pri príprave konkrétneho projektu. Od vedúceho tímu sa očakáva, že bude tento súbor nástrojov aktívne sledovať a navrhovať jeho vylepšenia.</p>
-
-  <h2>1. Každodenné kľúčové nástroje</h2>
-  <ul class="bullet">
-    <li><strong>Notion (Riadiace centrum štúdia):</strong> Centrálne miesto, kde sa nachádzajú informácie o projektoch, databázy, dokumentácia, procesy a interné znalosti. Vedúci tímu pôsobí ako hlavný správca grantovej sekcie. Udržiava tu databázu výziev (ich stavy a termíny), databázu pre 8 kľúčových projektov štúdia s ich grantovými mapami, trvalú knižnicu úspešných žiadostí a kontakty na administrátorov.</li>
-    <li><strong>ClickUp (Projektové riadenie):</strong> Nástroj na detailnú evidenciu úloh, kalendáre a sledovanie kapacít tímu. Zatiaľ čo Notion drží štruktúru a kontext, ClickUp slúži na dennú operatívu. Vedúci tímu v ňom sleduje prácu stážistov, prerozdeľuje zadania k žiadostiam a kontroluje dodržiavanie termínov.</li>
-    <li><strong>Slack (Vnútrotímová komunikácia):</strong> Hlavný kanál na rýchlu internú komunikáciu, oznamy a projektové debaty. Slúži na riešenie operatívnych otázok autorov, odstraňovanie prekážok pri práci a zdieľanie noviniek bez nutnosti zvolávať hovory.</li>
-    <li><strong>Gmail (Oficiálna komunikácia):</strong> Nástroj na profesionálnu externú komunikáciu s administrátormi grantových fondov, partnermi v medzinárodných združeniach a externými konzultantmi. Slúži na overovanie faktov, riešenie oprávnenosti a budovanie písomnej stopy pre potreby budúcich auditov.</li>
-    <li><strong>Google Calendar (Plánovanie času):</strong> Centrálny kalendár štúdia na plánovanie porád s tímom, stretnutí s partnermi, hovorov s administrátormi a sledovanie kritických termínov (uzávierky výziev, reportovacie míľniky).</li>
-    <li><strong>Calendly (Automatické plánovanie stretnutí):</strong> Používa sa na automatické rezervovanie hovorov s externými partnermi alebo konzultantmi, ktorí si sami vyberú voľný čas v kalendári, čo šetrí čas pri dohadovaní stretnutí.</li>
-    <li><strong>1Password (Bezpečnosť a prístupy):</strong> Centrálny správca hesiel. Všetky prístupy ku grantovým portálom, službám a interným systémom sú bezpečne uložené na tomto mieste.</li>
-  </ul>
-
-  <h2>2. Grantové portály a inštitucionálne systémy</h2>
-  <p>Táto vrstva je špecifická pre rolu vedúceho tímu, ktorý je hlavným operátorom týchto systémov za štúdio a buduje v nich najhlbšiu expertízu.</p>
-  <ul class="bullet">
-    <li><strong>Európsky portál pre financovanie a verejné obstarávanie (EU Funding &amp; Tenders Portal):</strong> Oficiálna brána pre centralizované európske programy (Horizont Európa, Kreatívna Európa MEDIA, Erasmus+). Slúži na registráciu subjektov štúdia, nahrávanie úradných dokumentov, podávanie žiadostí, komunikáciu s hodnotiteľmi a riadenie celého životného cyklu schválených grantov.</li>
-    <li><strong>Portál EACEA:</strong> Špecializovaný systém pre programy pod Výkonnou agentúrou pre vzdelávanie a kultúru (najmä projekty spolupráce Kreatívnej Európy). Slúži na komunikáciu s pridelenými úradníkmi, podávanie priebežných a záverečných správ a riadenie zmien v projekte.</li>
-    <li><strong>CORDIS a OpenAIRE:</strong> Verejné databázy európskych výskumných projektov, ktoré slúžia ako zdroj inšpirácie, overovania schválených konceptov a vyhľadávania potenciálnych partnerov do medzinárodných združení.</li>
-    <li><strong>Elektronický dotačný systém AVF (Audiovizuálny fond):</strong> Hlavný slovenský portál pre podávanie žiadostí v oblasti audiovízie, kde má štúdio úspešnú históriu realizovaných projektov. Pri AVF sa kombinuje elektronické podanie s následnou tlačou, podpisovaním a fyzickým odoslaním dokumentácie.</li>
-    <li><strong>Elektronický dotačný systém FPU (Fond na podporu umenia):</strong> Systém pre kultúrne a vzdelávacie projekty, relevantný najmä pre aktivity realizované pod partnerským občianskym združením (knihy, ilustrácie, edukačné koncepty).</li>
-    <li><strong>Estónsky filmový inštitút (EFI) a estónske národné portály:</strong> Relevantné systémy pre podávanie žiadostí a rozvoj aktivít prostredníctvom estónskej pobočky štúdia so sídlom v Tallinne.</li>
-    <li><strong>Národné agentúry Erasmus+ (SAAIC na Slovensku, Archimedes v Estónsku):</strong> Decentralizované podávacie systémy pre vzdelávacie projekty a primárne kontaktné miesta pre konzultácie k daným výzvam.</li>
-    <li><strong>Portály súkromných nadácií:</strong> Špecifické online systémy súkromných poskytovateľov (napríklad Nadácia Roberta Boscha) využívané pri príprave žiadostí zameraných na konkrétne spoločenské témy.</li>
-  </ul>
-
-  <h2>3. Infraštruktúra umelej inteligencie a automatizácie</h2>
-  <p>V tejto oblasti vedúci tímu systémy nielen aktívne používa, ale ich aj metodicky usmerňuje a optimalizuje na základe reálnych skúseností.</p>
-  <ul class="bullet">
-    <li><strong>Claude Chat (Sparing partner):</strong> Každodenný asistent na strategické premýšľanie, generovanie textov, sumarizáciu podkladov, analýzu dokumentov a kontrolu logickej konzistencie textov stážistov.</li>
-    <li><strong>Claude Projects (Kontextové úložisko):</strong> Miesto, kde sa pre každú žiadosť ukladá kompletný kontext (dokumentácia k výzve, úspešné predošlé žiadosti, vizuálne a textové špecifiká štúdia). Asistent potom pracuje presne v rámci týchto mantinelov.</li>
-    <li><strong>Claude Cowork (Kolaboratívna analýza):</strong> Automatizovaný asistent, ktorý každý pondelok prechádza nové výzvy v databáze, porovnáva ich s plánom štúdia a pripravuje stručné týždenné zhrnutie s odporúčaniami. Vedúci tímu tento výstup reviduje a predkladá vedeniu.</li>
-    <li><strong>Interné kódové úložisko štúdia (Claude Code):</strong> Nástroj, cez ktorý technický tím stavia vlastných interných asistentov a automatizácie. Vedúci tímu vystupuje ako koncový užívateľ týchto špecializovaných vyhľadávacích a archivačných robotov.</li>
-    <li><strong>Gemini:</strong> Doplnkový nástroj využívaný najmä na štylistickú optimalizáciu slovenských textov (pre potreby žiadostí AVF a FPU) a prepojenie s Google ekosystémom.</li>
-    <li><strong>n8n (Vizuálna automatizácia):</strong> Nástroj na automatické prepojenie rôznych služieb bez nutnosti programovania. Zabezpečuje napríklad automatické zbieranie nových výziev z približne 20 oficiálnych zdrojov a ich priamy zápis do databázy v nástroji Notion.</li>
-    <li><strong>Lovable:</strong> Vývojový nástroj na rýchlu tvorbu funkčných digitálnych vzoriek z prirodzeného jazyka. Pri komplexných európskych žiadostiach sa využíva na tvorbu interaktívnych príloh, čo zvyšuje úspešnosť žiadostí oproti bežným statickým návrhom.</li>
-  </ul>
-
-  <h2>4. Súborové úložiská, zálohovanie a administratíva</h2>
-  <ul class="bullet">
-    <li><strong>Google Drive:</strong> Úložisko na zdieľanie textových dokumentov, tabuliek, zdrojových materiálov hlavných konceptov a na spoločnú prácu s medzinárodnými partnermi.</li>
-    <li><strong>Backblaze Backup (Dlhodobé zálohovanie):</strong> Automatická cloudová poistka, ktorá zálohuje sieťové diskové úložisko štúdia. Zabezpečuje, že všetky dokumenty schválených projektov sú bezpečne archivované a pripravené na kontrolu, čo spĺňa požiadavku donorov na uchovávanie dát po dobu piatich rokov od skončenia projektu.</li>
-    <li><strong>Typeform (Zber dát):</strong> Formulárový systém na zber informácií od partnerov v konzorciu (životopisy, finančné údaje, čestné vyhlásenia) alebo na dotazníkové vyhodnocovanie realizovaných projektov.</li>
-    <li><strong>SignWell (Digitálne podpisovanie):</strong> Nástroj na elektronické podpisovanie partnerských zmlúv, dohôd o mlčanlivosti s externými konzultantmi a interných dokumentov so stážistami.</li>
-    <li><strong>GitHub:</strong> Úložisko zdrojového kódu interných aplikácií štúdia. Vedúci tímu ho priamo nepoužíva, slúži ako kontext pri komunikácii s administrátorským tímom o úpravách interných grantových nástrojov.</li>
-  </ul>
-
-  <h2>Odporúčaný postup pri nástupe</h2>
-  <p>V prvých dňoch sa pozornosť zameriava na osvojenie každodenného základu — nástrojov Notion, ClickUp, Slack, Gmail, Google Calendar a 1Password. Následne sa prechádza na prácu s asistentmi Claude pri revízii textov stážistov. Ostatné nástroje, najmä zložité grantové portály a správa automatizácií, sa preberajú postupne podľa toho, ako prichádzajú termíny jednotlivých úloh. Pri každej prvej skúsenosti s novým dotačným systémom je k dispozícii mentorská podpora zo strany kreatívneho riaditeľa alebo externého konzultanta.</p>
 </article>
 
-<!-- ============== SYSTÉMY / AI ============== -->
-<article class="page" data-page="systemy/ai">
-  <div class="kicker"><span>Systémy</span><span class="num">· Využitie umelej inteligencie</span></div>
-  <h1 class="page-title">Umelá inteligencia<br>a <em>interné</em> procesy.</h1>
-  <p class="lede">V štúdiu využívame súbor nástrojov umelej inteligencie, ktorý preberá väčšinu opakujúcich sa a technických úloh. Vďaka tomu sa ľudská práca môže sústrediť na kritický úsudok, kvalitu a strategické rozhodovanie. Pri tíme desiatich autorov a 24 až 40 žiadostiach ročne je táto infraštruktúra kľúčom k udržateľnému chodu celého oddelenia.</p>
-  <p>Centrálnym nástrojom je digitálny asistent Claude, ktorý dokáže pracovať s lokálnymi súbormi a vykonávať komplexné úlohy. Dopĺňajú ho platforma n8n na automatizácie, Notion ako centrálna databáza, vizuálny pomocník Claude Design, nástroje Lovable a v0 na rýchlu tvorbu interaktívnych vzoriek a prostredia Cursor či Claude Code pre úpravu pomocných kódov. Tento systém sa neustále vyvíja a vedúci tímu ho postupne dolaďuje na základe reálnych skúseností.</p>
+<!-- ============== NÁPLŇ PRÁCE / HRANICE ZODPOVEDNOSTI ============== -->
+<article class="page" data-page="naplna/hranice" style="--bg:#ffffff;--accent:#bf4a41;--text:#0a0a0a">
+  <div class="kicker"><span>Náplň práce</span><span class="num">· Hranice zodpovednosti</span></div>
+  <h1 class="page-title">Hranice<br><em>zodpovednosti</em>.</h1>
+  <p class="lede">Tieto hranice sú nastavené ako ochrana vedúceho tímu pred zodpovednosťou, ktorá patrí vedeniu, a zároveň ako ochrana štúdia pred administratívnymi rizikami. Jasne ohraničujú rolu a chránia vedúceho tímu pred úlohami, na ktoré nemá mandát ani prípravu.</p>
 
-  <h2>1. Sledovanie a mapovanie grantových výziev</h2>
-  <p>Vyhľadávanie nových príležitostí prebieha plne automatizovane prostredníctvom nástroja n8n, ktorý monitoruje 15 až 20 oficiálnych domácich i zahraničných zdrojov (vrátane európskych portálov, kancelárií Kreatívnej Európy, Audiovizuálneho fondu, Fondu na podporu umenia či súkromných nadácií). Nové výzvy sa automaticky zapisujú do internej databázy so všetkými základnými údajmi.</p>
+  <h2>Čo vedúci grantového tímu nevykonáva</h2>
   <ul class="bullet">
-    <li><strong>Týždenné prehľady:</strong> Každé pondelok ráno asistent Claude prejde nové záznamy, porovná ich s plánom projektov štúdia a pripraví stručné jednostranové zhrnutie s odporúčaniami (rozdelené na: hodné pozornosti, monitorovať, nerelevantné).</li>
-    <li><strong>Úloha vedúceho tímu:</strong> V operatívnej rovine tento prehľad reviduje, dopĺňa o expertný úsudok, hľadá príležitosti pre medzinárodné partnerstvá a navrhuje kreatívnemu riaditeľovi výzvy na schválenie. V systémovej rovine sleduje úspešnosť asistenta, upravuje jeho inštrukcie, pridáva nové zdroje a rozvíja celú logiku vyhľadávania.</li>
+    <li><strong>Neschvaľuje strategické smerovanie projektov:</strong> Vedúci tímu pripravuje podklady, analýzy výziev a odporúčania, no finálne rozhodnutie o tom, do ktorých programov sa štúdio zapojí, zostáva na kreatívnom riaditeľovi a producentovi.</li>
+    <li><strong>Neodosiela žiadosti úplne samostatne:</strong> Finálnu kontrolu oprávnenosti subjektu a samotné odoslanie žiadosti cez oficiálne európske portály vykonáva kreatívny riaditeľ (najmä z dôvodov overovania kreditov producenta pri špecifických výzvach).</li>
+    <li><strong>Nevedie strategické rokovania s donormi:</strong> Pripravuje materiály, analýzy a zúčastňuje sa na stretnutiach, no komunikáciu na najvyššej strategickej úrovni vedie kreatívny riaditeľ alebo externý konzultant.</li>
+    <li><strong>Neschvaľuje rozpočty s konečnou platnosťou:</strong> Zostavuje návrhy rozpočtov, prepočítava mzdové limity a subdodávky, no konečné schválenie finančného plánu je plne v rukách producenta štúdia.</li>
+    <li><strong>Nerieši účtovníctvo:</strong> Zapisovanie faktúr a platieb do účtovného systému, spracovanie DPH, dane zo zahraničných platieb a formátovanie finančných výkazov v štruktúre donora sú výhradnou prácou externého účtovníka.</li>
+    <li><strong>Neschvaľuje platby:</strong> Schvaľovanie jednotlivých faktúr, platieb externistom a dodávateľom, autorizácia bankových prevodov a rozhodovanie o presunoch rozpočtu sú v kompetencii kreatívneho riaditeľa a producenta. Vedúci tímu pripravuje podklady, oni rozhodujú.</li>
+    <li><strong>Neriadi strategické spory:</strong> Vedenie zásadných vyjednávaní s partnermi pri konfliktoch, zmenách rozsahu, podpisovanie formálnych výstupov pre fondy a vystupovanie v pozícii hlavného zmluvného partnera prislúcha kreatívnemu riaditeľovi.</li>
+    <li><strong>Nenahrádza projektového manažéra štúdia:</strong> Vystavovanie zmlúv pre externistov, komunikácia o platbách s tímom, nákup softvéru a stráženie produkčných termínov sú prácou projektového manažéra štúdia. Zatiaľ čo on riadi projekt smerom dovnútra (k produkcii a tímu), vedúci grantového tímu ho riadi smerom navonok (k poskytovateľovi a súladu s predpismi).</li>
   </ul>
-
-  <h2>2. Príprava konkrétnej žiadosti</h2>
-  <p>Pri každej schválenej výzve pomáha umelá inteligencia spracovať dokumentáciu. Asistent podrobne analyzuje podmienky výzvy (často 30 až 80-stranové dokumenty v úradnej angličtine), zostaví úvodný kontrolný zoznam oprávnenosti, identifikuje hodnotené kritériá a vytiahne zoznam povinných príloh. Všetok tento kontext, spolu s minulými úspešnými projektmi, zostáva uložený pri danej žiadosti.</p>
-  <p>Na tomto základe stážisti pripravujú prvé textové návrhy sekcií (popis projektu, spoločenský dopad, pracovné balíky či plány šírenia výsledkov). Na vizuálne prílohy a prezentácie sa využíva generovanie dizajnu s finálnou úpravou v nástroji Figma. Ak žiadosť vyžaduje technickú zložku, nástroje Lovable alebo v0 dokážu v priebehu pár hodín vytvoriť funkčný interaktívny prototyp, čo štúdio výrazne odlišuje od ostatných uchádzačov.</p>
-  <p>Zodpovednosť vedúceho tímu v tejto fáze nestojí na písaní textov, ale na troch iných úrovniach:</p>
-  <ul class="bullet">
-    <li><strong>Kontrola kvality a etiky:</strong> Dohliada na to, aby stážisti nepoužívali surové výstupy z umelej inteligencie. Výsledný text musí znieť ako odborná strategická práca. Zároveň stráži dodržiavanie pravidiel daného fondu a bezpečnosť citlivých dát štúdia.</li>
-    <li><strong>Prvé kolo revízie:</strong> Vykonáva dôslednú kontrolu logiky textu, úrovne anglického jazyka, štylistickej jednotnosti a úplnosti príloh ešte predtým, než materiál dostane na stôl kreatívny riaditeľ.</li>
-    <li><strong>Optimalizácia postupov:</strong> Analyzuje, kde technológia čas šetrí a kde robí chyby. Na základe toho vylepšuje zadania pre stážistov a buduje internú knižnicu inštrukcií, ktorá po šiestich mesiacoch zrýchľuje prípravu nových žiadostí o 20 % až 30 %.</li>
-  </ul>
-
-  <h2>3. Fáza po podaní a schválení grantu</h2>
-  <p>Technologická podpora pokračuje aj po odoslaní projektu. Pred samotným podaním asistent spustí kontrolu formálnych náležitostí (formáty príloh, pravidlá pomenovávania súborov). Po odoslaní zaeviduje žiadosť do systému a naplánuje následné termíny.</p>
-  <p>Ak je grant schválený, systém analyzuje grantovú dohodu (často 50 až 100-stranový dokument), vytiahne z nej kľúčové záväzky a termíny priamo do plánovacieho systému tímu. Počas realizácie pomáha organizovať štruktúru priečinkov, triedi dokumenty (faktúry, výkazy práce) podľa pracovných balíkov a pripravuje prvé návrhy priebežných správ.</p>
-  <ul class="bullet">
-    <li><strong>Úloha vedúceho tímu:</strong> Pôsobí ako koordinátor celého procesu. Keďže technológia preberá mechanickú administratívu, vedúci tímu sa môže naplno sústrediť na činnosti, ktoré vyžadujú ľudský prístup — samotné finálne odoslanie cez oficiálne portály, strategické presuny v rozpočte, komunikáciu s partnermi, osobné rokovania s poskytovateľmi fondov a prípravu na nezávislé audity.</li>
-  </ul>
-
-  <h2>4. Automatizácia e-mailovej komunikácie</h2>
-  <p>Dôležitou súčasťou zázemia je autonómny e-mailový asistent, ktorý priebežne spracováva prichádzajúce správy. Pomáha s ich triedením, pripravuje návrhy odpovedí a v prípade naliehavých správ posiela okamžité upozornenia cez Telegram. Kreatívnemu tímu takto šetrí 5 až 15 hodín práce týždenne.</p>
-  <p>Pre vedúceho tímu, ktorý spravuje stovky e-mailov v rôznych štýloch (od prísne formálnej európskej angličtiny po neformálny tón s partnermi), prináša tento asistent dva zásadné benefity:</p>
-  <ul class="bullet">
-    <li><strong>Pamäť kontextu pre každého adresáta:</strong> Systém si pamätá celú históriu komunikácie s konkrétnym úradníkom alebo zahraničným partnerom. Návrh odpovede tak prichádza automaticky v správnom jazykovom štýle a tóne, bez nutnosti spätne dohľadávať staré správy.</li>
-    <li><strong>Okamžité upozornenia na dôležité termíny:</strong> Pri urgentných výzvach na objasnenie žiadostí alebo pri zmluvných vyjednávaniach, kde doručenie odpovede do 24 hodín rozhoduje o úspechu celého grantu, posiela systém okamžitú notifikáciu. Žiadna dôležitá správa tak neostane bez povšimnutia.</li>
-  </ul>
-
-  <h2>Základný princíp fungovania</h2>
-  <div class="callout"><div class="ck">Synergia</div><p>Celá architektúra je postavená na jednoduchej synergii: technológie dodávajú rýchlosť, presnosť a zvládnutie veľkého objemu dát, zatiaľ čo vedúci tímu prináša strategický úsudok, empatiu, kvalitu a politickú citlivosť.</p></div>
-  <p>Tento model umožňuje jednému človeku s desiatimi stážistami efektívne viesť oddelenie, ktoré by v tradičných podmienkach vyžadovalo štyroch až piatich seniorných špecialistov. Zároveň poskytuje jedinečnú príležitosť osvojiť si pokročilé technológie v reálnom komerčnom a tvorivom prostredí. Celý systém sa v prvých troch mesiacoch nastavuje spoločne s vedením a administratívnym tímom, pričom od štvrtého mesiaca už vedúci preberá plnú kontrolu nad jeho smerovaním.</p>
-</article>
-
-<!-- ============== SYSTÉMY / EKOSYSTÉM ============== -->
-<article class="page" data-page="systemy/ekosystem">
-  <div class="kicker"><span>Systémy</span><span class="num">· Grantový ekosystém</span></div>
-  <h1 class="page-title">Architektúra<br>a dizajn <em>databáz</em>.</h1>
-  <p class="lede">Grantová agenda štúdia je organizovaná prostredníctvom systému ôsmich prepojených databáz v prostredí Notion. Tento systém sprevádza každú žiadosť celým jej životným cyklom — od prvého vyhľadania fondu cez konkrétnu výzvu až po schválenie a následnú realizáciu projektu. Vedúci grantového tímu pôsobí ako hlavný správca tejto štruktúry, stará sa o presnosť dát a pomáha ju rozvíjať pre potreby desiatich autorov žiadostí.</p>
-
-  <h2>Logika a rozdelenie systému</h2>
-  <p>Systém stojí na dvoch základných princípoch, ktoré pomáhajú udržiavať poriadok bez zbytočného opakovania informácií:</p>
-  <ul class="bullet">
-    <li><strong>Oddelenie trvalých údajov od dynamických:</strong> Informácie, ktoré sa nemenia (pravidlá programov, identita fondov, profily právnych subjektov), sú uložené oddelene od tých, ktoré sa menia s každým dotačným kolom (termíny, rozpočty, aktuálne rozhodnutia).</li>
-    <li><strong>Oddelenie tvorivej vízie od konkrétneho výstupu:</strong> Zastrešujúci umelecký koncept (napríklad vzdelávací svet <em>Compactino</em>) je oddelený od konkrétneho média (<em>Compactino</em> kniha, <em>Compactino</em> aplikácia), na ktoré sa reálne žiada finančná podpora. Fondy totiž nefinancujú myšlienku ako celok, ale vždy konkrétny výstup s jasne stanoveným rozpočtom a plánovanými výsledkami.</li>
-  </ul>
-
-  <h2>Osem databáz a ich funkcie</h2>
-  <div class="card-grid">
-    <div class="card"><span class="num">DB · 01</span><h3>FUNDS (Fondy)</h3><p>Zoznam inštitúcií (napríklad Audiovizuálny fond, Fond na podporu umenia, Estónsky filmový inštitút či Nadácia Roberta Boscha). Databáza uchováva ich základné údaje, kontakty, spôsoby podávania žiadostí a priebežné poznatky z komunikácie.</p></div>
-    <div class="card"><span class="num">DB · 02</span><h3>PROGRAMS (Programy)</h3><p>Trvalé dotačné programy patriace pod jednotlivé fondy. Popisujú stále pravidlá — oprávnených žiadateľov, maximálne výšky podpory, podiely spolufinancovania a geografický rozsah. Súčasťou je pole pre posúdenie strategického súladu.</p></div>
-    <div class="card"><span class="num">DB · 03</span><h3>CALLS (Výzvy)</h3><p>Konkrétne časové cykly programov s presnými termínmi uzávierok a rozpočtami pre dané kolo. Sleduje sa tu stav samotnej výzvy (pripravovaná, otvorená, vyhodnocovaná) a nezávisle od toho aj interné rozhodnutie štúdia (zvažuje sa, podá sa žiadosť, podaná, vynechaná).</p></div>
-    <div class="card"><span class="num">DB · 04</span><h3>PROJECTS (Zastrešujúce projekty)</h3><p>Umelecké svety a koncepčné duševné vlastníctvo štúdia (napríklad projekty <em>Compactino</em>, <em>Bororo</em>, <em>Kinvale</em>, <em>Interactoons</em> či <em>Invisible Craftsmen</em>). Táto vrstva slúži na udržanie tvorivej vízie a identity značky na jednom mieste.</p></div>
-    <div class="card"><span class="num">DB · 05</span><h3>MEDIA (Konkrétne médiá)</h3><p>Hmatateľné výstupy projektov, na ktoré sa priamo žiada podpora. Jeden zastrešujúci projekt môže mať viacero výstupov (napríklad projekt <em>Compactino</em> zahŕňa aplikáciu, knihu a animovaný seriál). Každé médium má vlastný rozpočet a plánované výsledky.</p></div>
-    <div class="card"><span class="num">DB · 06</span><h3>APPLICANT ENTITIES (Žiadatelia)</h3><p>Tri samostatné právnické osoby, cez ktoré štúdio podáva žiadosti (Studio Bororo s.r.o., Smatana OÜ, Burizon o.z.). Každý subjekt má špecifickú jurisdikciu, registráciu v európskych portáloch a profil oprávnenosti pre rôzne typy fondov.</p></div>
-    <div class="card"><span class="num">DB · 07</span><h3>GRANT COORDINATORS (Autori žiadostí)</h3><p>Prehľad členov grantového tímu. Sleduje sa tu ich kapacita, špecializácia na konkrétne fondy (napríklad slovenské schémy alebo seversko-pobaltácke programy), rozpracované žiadosti a podklady pre výpočet úspechových odmien.</p></div>
-    <div class="card"><span class="num">DB · 08</span><h3>APPLICATIONS (Konkrétne žiadosti)</h3><p>Prepojovacia tabuľka, ktorá spája celý ekosystém do jedného bodu. Spája konkrétne médium, vyhlásenú výzvu, žiadajúci právny subjekt a zodpovedného autora do jedného záznamu. Sleduje sa tu stav písania a hodnotenia, schválené sumy a celá fáza realizácie vrátane správ a auditov.</p></div>
-  </div>
-
-  <h2>Prepojenia a praktické využitie systému</h2>
-  <p>Vďaka vzájomným väzbám databáz dokáže systém okamžite odpovedať na dôležité prevádzkové otázky:</p>
-  <ul class="bullet">
-    <li>Umožňuje rýchlo vyfiltrovať všetky žiadosti podané v danom roku do konkrétneho programu či fondu.</li>
-    <li>Zobrazuje súhrn schválených súm a podkladov pre odmeny priradené k jednotlivým autorom.</li>
-    <li>Prepojí novo vyhlásené výzvy s konkrétnymi médiami v portfóliu, pre ktoré by mohli byť vhodné.</li>
-    <li>Poskytuje historický prehľad úspešnosti štúdia v jednotlivých podprogramoch za uplynulé obdobia.</li>
-  </ul>
-
-  <h2>Úloha vedúceho tímu pri správe systému</h2>
-  <p>Pozícia nevyžaduje budovanie tejto štruktúry od začiatku, keďže systém je už navrhnutý a pripravený na prevádzku. Medzi hlavné zodpovednosti patrí:</p>
-  <ul class="bullet">
-    <li><strong>Udržiavanie presnosti dát:</strong> Pravidelné dopĺňanie nových výziev, aktualizácia stavov žiadostí a priebežné zaznamenávanie poznatkov o fondoch a programoch.</li>
-    <li><strong>Metodická podpora tímu:</strong> Prerozdeľovanie úloh stážistom prostredníctvom databázy autorov a sledovanie ich časových kapacít.</li>
-    <li><strong>Strategická analýza:</strong> Spolupráca s kreatívnym riaditeľom pri priraďovaní nových projektov k vhodným programom a vypĺňanie polí pre posúdenie strategického súladu.</li>
-    <li><strong>Priebežná optimalizácia:</strong> Navrhovanie drobných vylepšení, zjednodušovanie prepojení a čistenie nadbytočných polí tak, aby systém zostal pre tím praktickým a prehľadným pomocníkom.</li>
-  </ul>
-
-  <h2>Význam databázového dizajnu</h2>
-  <p>Pri desiatich autoroch žiadostí hrozí, že by sa dôležité informácie, poznatky z konzultácií či kontakty na partnerov rozptýlili do mnohých samostatných tabuliek a osobných poznámok. Po skončení dotačného cyklu by tak štúdio prichádzalo o cenné skúsenosti.</p>
-  <p>Tento prepojený systém zaručuje, že každý neformálny tip od administrátora, postreh z hodnotenia minulej žiadosti alebo overený kontakt na medzinárodného partnera zostane bezpečne uložený. Znalosti získané pri jednom projekte tak priamo pomáhajú úspechu všetkých nasledujúcich žiadostí, čím sa buduje trvalé a spoločné know-how celého tímu.</p>
 </article>
 <!-- ============== PODMIENKY / ODMENA ============== -->
-<article class="page" data-page="podmienky/odmena">
+<article class="page" data-page="podmienky/odmena" style="--bg:#f4f5f7;--accent:#5abc88;--text:#0a0a0a">
   <div class="kicker"><span>Podmienky</span><span class="num">· Odmena</span></div>
-  <h1 class="page-title">Hybridný model<br><em>odmeňovania</em>.</h1>
-  <p class="lede">Pre túto pozíciu je navrhnutý hybridný model odmeňovania, ktorý kombinuje stabilnú finančnú istotu s mimoriadne silným success fee, ktorý priamo odzrkadľuje efektivitu riadenia a úspešnosť celého oddelenia.</p>
+  <h1 class="page-title">Odmena.</h1>
+  <p class="lede"><strong>Pre túto pozíciu je navrhnutý hybridný model odmeňovania. Kombinuje stabilnú finančnú istotu so success fee, ktorý priamo odzrkadľuje efektivitu riadenia a úspešnosť celého oddelenia.</strong></p>
 
   <h2>Forma spolupráce</h2>
   <p>Spolupráca prebieha výhradne na faktúru (živnosť alebo s.r.o.). Spolupracovník fakturuje štúdiu mesačne na základe rámcovej zmluvy.</p>
@@ -717,69 +513,67 @@ details[open] .faq-q .qmark{transform:rotate(45deg)}
   <p>Spolupracovník si sám spravuje daňovú a odvodovú agendu, čo mu zároveň otvára priestor pre daňovú optimalizáciu (paušálne výdavky, využitie statusu študenta-doktoranda, alebo iné mechanizmy podľa jeho situácie).</p>
 
   <h2>Štruktúra odmeny</h2>
-  <p>Odmena má dve zložky — pravidelný fixný základ a percentuálny bonus zo schválených žiadostí, ktoré podal tím Team Leada.</p>
+  <p>Odmena má dve zložky - pravidelný fixný základ a percentuálny bonus zo schválených žiadostí, ktoré podal tím Team Leada.</p>
   <p>Kombinácia týchto dvoch zložiek je dizajnovaná tak, aby spolupracovník mal istotu pravidelného príjmu od prvého mesiaca a zároveň priame ekonomické napojenie na úspech celého grantového tímu.</p>
   <ul class="bullet">
-    <li><strong>Pevná mesačná odmena: 1 000 eur:</strong> Fixum sa vypláca mesačne na základe faktúry, bez ohľadu na to, či v danom mesiaci boli schválené granty alebo nie. Pokrýva pravidelnú prácu — tímové porady, mesačné individuálne stretnutia s autormi grantových žiadostí, asynchrónne riadenie cez Notion, komunikáciu s administrátormi grantových fondov, kvalitatívne reviews draftov, onboarding nových členov tímu, údržbu dokumentácie a ďalšie činnosti uvedené v časti Náplň práce.</li>
-    <li><strong>Percentuálny bonus: 1 % zo všetkých schválených grantov tímu:</strong> Bonus sa počíta z čistej výšky každej schválenej žiadosti, ktorá smeruje na účet štúdia (rovnaký výpočtový princíp ako u stážistov — netto suma od donora, nie celkový rozpočet projektu). Bonus sa vzťahuje na <em>každú schválenú žiadosť celého tímu</em> — bez ohľadu na to, kto z 10 stážistov žiadosť podával. Logika je jednoduchá: Team Lead má operatívny dohľad nad každou aplikáciou, kvalitatívne ju reviewuje, koordinuje partnerstvá a komunikáciu s administrátormi, a teda má zásluhu na úspechu každej z nich.</li>
+    <li><strong>Pevná mesačná odmena: 300 eur:</strong> Fixum sa vypláca mesačne na základe faktúry, bez ohľadu na to, či v danom mesiaci boli schválené granty alebo nie. Pokrýva pravidelnú prácu - tímové porady, mesačné individuálne stretnutia s autormi grantových žiadostí, asynchrónne riadenie cez Notion, komunikáciu s administrátormi grantových fondov, kvalitatívne reviews draftov, onboarding nových členov tímu, údržbu dokumentácie a ďalšie činnosti uvedené v časti Náplň práce.</li>
+    <li><strong>Percentuálny bonus: 1 % zo všetkých schválených grantov tímu:</strong> Bonus sa počíta z čistej výšky každej schválenej žiadosti, ktorá smeruje na účet štúdia (rovnaký výpočtový princíp ako u stážistov - netto suma od donora, nie celkový rozpočet projektu). Bonus sa vzťahuje na <em>každú schválenú žiadosť celého tímu</em> - bez ohľadu na to, kto z 10 stážistov žiadosť podával. Logika je jednoduchá: Team Lead má operatívny dohľad nad každou aplikáciou, kvalitatívne ju reviewuje, koordinuje partnerstvá a komunikáciu s administrátormi, a teda má zásluhu na úspechu každej z nich.</li>
   </ul>
 
   <h2>Prečo je tento model vysoko profitabilný?</h2>
   <ul class="bullet">
-    <li><strong>Akumulačný efekt:</strong> Sila tohto modelu spočíva v jeho rozsahu, celospoločenskom dopade a v strategickom prístupe k tvorbe žiadostí.</li>
     <li><strong>Vysoký počet príležitostí s celospoločenským významom:</strong> V štúdiu máme vo fáze skorého vývoja rozpracovaných <strong>8 paralelných kľúčových projektov</strong>. Všetky tieto projekty majú hlboký zmysel pre spoločnosť a reagujú na pálčivé výzvy dnešnej doby. Venujú sa dôležitým témam, ako sú ochrana demokracie, boj proti digitálnym falzifikátom a manipuláciám reality, zvyšovanie digitálnej gramotnosti, vplyv sociálnych sietí na mládež, ako aj ochrana kultúrneho dedičstva a rozmanitosti kultúr. Tento silný etický a spoločenský rozmer robí naše projekty pre domáce a európske grantové fondy mimoriadne atraktívnymi, čo výrazne zvyšuje šancu na ich schválenie.</li>
     <li><strong>Veľká kapacita tímu:</strong> Pod vedením grantového Team Leada pracuje <strong>10 motivovaných stážistov</strong>, ktorí sa venujú samotnému písaniu textov.</li>
-    <li><strong>Metóda zdrojového dokumentu:</strong> Nepíšeme každú žiadosť od úplného začiatku. Základom úspechu je vytvorenie komplexného hlavného dokumentu pre každý projekt, ktorý obsahuje technické, pedagogické aj kreatívne aspekty. Tento Master Project potom slúži ako východisko pre <strong>3 až 5 cielených adaptácií do rôznych grantových programov</strong>, kde sa upraví dôraz, štruktúra a slovník podľa špecifík každej výzvy. Druhá a tretia adaptácia toho istého projektu si vyžaduje len zlomok pôvodnej práce — typicky okolo 20 % efortu — pričom potenciálny výnos sa znásobuje.</li>
-    <li><strong>Násobiaci efekt:</strong> Pre Team Leada to znamená nasledujúcu matematiku. Ak je v portfóliu 8 projektov a každý z nich smeruje do 3–5 výziev, ročne sa pripravuje <strong>24 až 40 grantových žiadostí</strong>. Pri realistickej úspešnosti európskych programov 20–25 % (podľa programu a ročníka) sa schvália <strong>5 až 10 grantov ročne</strong>. Pri priemernej hodnote schváleného grantu €80 000 – €150 000 sa ročný objem schválených prostriedkov pohybuje v rozsahu <strong>€400 000 – €1 500 000</strong>. A keďže Team Lead dostáva 1 % zo <strong>všetkých</strong> schválených grantov tímu, kumulatívny efekt je výrazný. Toto nie je 1 % z jednej žiadosti — je to 1 % zo všetkého, čo tím spoločne pripraví a schváli.</li>
+    <li><strong>Metóda zdrojového dokumentu:</strong> Nepíšeme každú žiadosť od úplného začiatku. Základom úspechu je vytvorenie komplexného hlavného dokumentu pre každý projekt, ktorý obsahuje technické, pedagogické aj kreatívne aspekty. Tento Master Project potom slúži ako východisko pre <strong>3 až 5 cielených adaptácií do rôznych grantových programov</strong>, kde sa upraví dôraz, štruktúra a slovník podľa špecifík každej výzvy. Druhá a tretia adaptácia toho istého projektu si vyžaduje len zlomok pôvodnej práce - typicky okolo 20 % efortu - pričom potenciálny výnos sa znásobuje.</li>
+    <li><strong>Násobiaci efekt:</strong> Pre Team Leada to znamená nasledujúcu matematiku. Ak je v portfóliu 8 projektov a každý z nich smeruje do 3–5 výziev, ročne sa pripravuje <strong>24 až 40 grantových žiadostí</strong>. Pri realistickej úspešnosti európskych programov 20–25 % (podľa programu a ročníka) sa schvália <strong>5 až 10 grantov ročne</strong>. Pri priemernej hodnote schváleného grantu €80 000 – €150 000 sa ročný objem schválených prostriedkov pohybuje v rozsahu <strong>€400 000 – €1 500 000</strong>. A keďže Team Lead dostáva 1 % zo <strong>všetkých</strong> schválených grantov tímu, kumulatívny efekt je výrazný. Toto nie je 1 % z jednej žiadosti - je to 1 % zo všetkého, čo tím spoločne pripraví a schváli.</li>
   </ul>
 
   <h2>Modelové scenáre ročného balíka</h2>
   <table class="data-table">
-    <thead><tr><th>Scenár</th><th>Schválené granty ročne</th><th>Fixum (12 × 1 000 €)</th><th>Bonus 1 %</th><th>Celkový ročný balík</th></tr></thead>
+    <thead><tr><th>Scenár</th><th>Schválené granty ročne</th><th>Fixum (12 × 300 €)</th><th>Bonus 1 %</th><th>Celkový ročný balík</th></tr></thead>
     <tbody>
-      <tr><td>Konzervatívny</td><td>€400 000</td><td>€12 000</td><td>€4 000</td><td><span class="accent">€16 000</span></td></tr>
-      <tr><td>Stredný</td><td>€960 000</td><td>€12 000</td><td>€9 600</td><td><span class="accent">€21 600</span></td></tr>
-      <tr><td>Optimistický</td><td>€1 500 000</td><td>€12 000</td><td>€15 000</td><td><span class="accent">€27 000</span></td></tr>
-      <tr><td>Výnimočný</td><td>€2 000 000</td><td>€12 000</td><td>€20 000</td><td><span class="accent">€32 000</span></td></tr>
+      <tr><td>Konzervatívny</td><td>€400 000</td><td>€3 600</td><td>€4 000</td><td><span class="accent">€7 600</span></td></tr>
+      <tr><td>Stredný</td><td>€960 000</td><td>€3 600</td><td>€9 600</td><td><span class="accent">€13 200</span></td></tr>
+      <tr><td>Optimistický</td><td>€1 500 000</td><td>€3 600</td><td>€15 000</td><td><span class="accent">€18 600</span></td></tr>
+      <tr><td>Výnimočný</td><td>€2 000 000</td><td>€3 600</td><td>€20 000</td><td><span class="accent">€23 600</span></td></tr>
     </tbody>
   </table>
   <p>Tieto čísla rátajú s tým, že tím v plnej zostave podáva spolu 24–40 žiadostí ročne a Master Project model funguje tak, ako je dizajnovaný. Pri intenzívnejšej grantovej sezóne (napríklad ak sa otvorí veľký Horizon Europe call alebo EIC schéma, kde sa môže schváliť aj jeden grant v hodnote 300–500 tisíc eur), sa balík môže výrazne posunúť aj v rámci jediného úspechu.</p>
 
   <h2>Čo robí tento model férovým</h2>
   <p><strong>Istota od prvého mesiaca.</strong> Na rozdiel od stážistického modelu, kde je odmena výhradne success-based, Team Lead má od nástupu mesačný fixný príjem. To znamená, že môže do role vstúpiť bez finančnej neistoty a sústrediť sa na kvalitu práce, nie na zháňanie iných zdrojov.</p>
-  <p><strong>Priame napojenie na úspech tímu.</strong> Bonus 1 % zo všetkých schválených grantov vytvára situáciu, kde Team Lead nemá motiváciu zaplaviť tím veľkým množstvom slabých žiadostí — naopak, ekonomicky sa mu oplatí tlačiť na <em>kvalitu, strategickú prioritizáciu a synergiu medzi projektmi</em>. Master Project model je v tomto kľúčový: dobre pripravený hlavný dokument, ktorý sa správne adaptuje do viacerých výziev, znamená pre Team Leada <em>najvyššiu pridanú hodnotu pri najmenšej duplicitnej práci</em>.</p>
-  <p><strong>Kumulatívny rast v čase.</strong> Prvý rok je obdobím rozbehu — tím sa formuje, prvé žiadosti idú do schvaľovacieho procesu, ktorý trvá 4–9 mesiacov, a prvé bonusy prichádzajú s oneskorením. Od druhého roka sa však model stabilizuje a Team Lead pracuje v prostredí, kde sa <em>každý mesiac môže schváliť nový grant z minulých podaní</em> — paralelne s tým, ako podáva nové. Tento kumulatívny rytmus je dôvod, prečo dlhodobá spolupráca dáva oveľa väčší zmysel než krátkodobá.</p>
-  <p><strong>Ochrana pred nezávislými faktormi.</strong> Európske grantové programy majú prirodzenú mieru zamietnutia, ktorá súvisí s konkurenciou ročníka, politickými prioritami EU, alebo administratívnymi okolnosťami — teda s vecami, ktoré Team Lead nevie ovplyvniť. Fixum garantuje, že aj v mesiacoch, kde sa nezhmotní úspech, je práca slušne ohodnotená.</p>
-  <p><strong>Daňová flexibilita.</strong> Pri B2B modeli si Team Lead môže optimalizovať daňovú a odvodovú záťaž podľa svojej situácie — paušálne výdavky, status doktoranda, kombinácia s inými príjmami. To znamená, že čistý príjem v ruke môže byť pri rovnakom hrubom príjme výrazne vyšší než pri klasickom zamestnaneckom pomere.</p>
+  <p><strong>Priame napojenie na úspech tímu.</strong> Bonus 1 % zo všetkých schválených grantov vytvára situáciu, kde Team Lead nemá motiváciu zaplaviť tím veľkým množstvom slabých žiadostí - naopak, ekonomicky sa mu oplatí tlačiť na <em>kvalitu, strategickú prioritizáciu a synergiu medzi projektmi</em>. Master Project model je v tomto kľúčový: dobre pripravený hlavný dokument, ktorý sa správne adaptuje do viacerých výziev, znamená pre Team Leada <em>najvyššiu pridanú hodnotu pri najmenšej duplicitnej práci</em>.</p>
+  <p><strong>Kumulatívny rast v čase.</strong> Prvý rok je obdobím rozbehu - tím sa formuje, prvé žiadosti idú do schvaľovacieho procesu, ktorý trvá 4–9 mesiacov, a prvé bonusy prichádzajú s oneskorením. Od druhého roka sa však model stabilizuje a Team Lead pracuje v prostredí, kde sa <em>každý mesiac môže schváliť nový grant z minulých podaní</em> - paralelne s tým, ako podáva nové. Tento kumulatívny rytmus je dôvod, prečo dlhodobá spolupráca dáva oveľa väčší zmysel než krátkodobá.</p>
+  <p><strong>Ochrana pred nezávislými faktormi.</strong> Európske grantové programy majú prirodzenú mieru zamietnutia, ktorá súvisí s konkurenciou ročníka, politickými prioritami EU, alebo administratívnymi okolnosťami - teda s vecami, ktoré Team Lead nevie ovplyvniť. Fixum garantuje, že aj v mesiacoch, kde sa nezhmotní úspech, je práca ohodnotená.</p>
+  <p><strong>Daňová flexibilita.</strong> Pri B2B modeli si Team Lead môže optimalizovať daňovú a odvodovú záťaž podľa svojej situácie - paušálne výdavky, status doktoranda, kombinácia s inými príjmami. To znamená, že čistý príjem v ruke môže byť pri rovnakom hrubom príjme výrazne vyšší než pri klasickom zamestnaneckom pomere.</p>
 </article>
 
 <!-- ============== PODMIENKY / BENEFITY ============== -->
-<article class="page" data-page="podmienky/benefity">
+<article class="page" data-page="podmienky/benefity" style="--bg:#ffffff;--accent:#ff9a6e;--text:#0a0a0a">
   <div class="kicker"><span>Podmienky</span><span class="num">· Benefity</span></div>
-  <h1 class="page-title">Sloboda, dôvera<br>a <em>medzinárodný</em> rast.</h1>
+  <h1 class="page-title">Benefity.</h1>
   <div class="card-grid">
-    <div class="card"><span class="num">01</span><h3>Úplná sloboda miesta pôsobenia</h3><p>Možnosť pracovať na diaľku odkiaľkoľvek, kde je stabilné internetové pripojenie — z domu, kaviarne, knižnice alebo aj počas študijného pobytu v zahraničí. To prináša výraznú úsporu času a financií za dochádzanie.</p></div>
+    <div class="card"><span class="num">01</span><h3>Úplná sloboda miesta pôsobenia</h3><p>Možnosť pracovať na diaľku odkiaľkoľvek, kde je stabilné internetové pripojenie - z domu, kaviarne, knižnice alebo aj počas študijného pobytu v zahraničí. To prináša výraznú úsporu času a financií za dochádzanie.</p></div>
     <div class="card"><span class="num">02</span><h3>Dôvera namiesto sledovania času</h3><p>Štúdio nevyužíva mechanické nástroje na kontrolu odpracovaných hodín. Vedúci tímu dostáva plnú dôveru a priestor na samostatnú prácu, vďaka čomu môže efektívne riadiť nielen čas svojho tímu, ale aj ten svoj.</p></div>
     <div class="card"><span class="num">03</span><h3>Súlad s doktorandským štúdiom</h3><p>Prípadné akademické povinnosti alebo vedecká činnosť sú na prvom mieste. Vedúci tímu si prispôsobuje svoju agendu vlastnému rozvrhu, skúškam a iným školským povinnostiam. Hodnotí sa plynulý chod projektov a spoľahlivosť, nie fixná prítomnosť v kancelárii.</p></div>
     <div class="card"><span class="num">04</span><h3>Autonómia</h3><p>Kultúra štúdia stavia na samostatnosti a dáva vedúcemu tímu priestor na vlastné manažérske rozhodnutia. Absencia mikromanažmentu umožňuje rýchlejšie napredovanie celého oddelenia.</p></div>
     <div class="card"><span class="num">05</span><h3>Osvojenie moderných nástrojov a AI</h3><p>Súčasťou každodennej rutiny je práca s pokročilými projektovými systémami. Vedúci tímu sa naučí hĺbkovo využívať nástroje umelej inteligencie na zefektívnenie manažérskej práce, analýzu výziev a optimalizáciu textov.</p></div>
-    <div class="card"><span class="num">06</span><h3>Výnimočné kontakty v európskom ekosystéme</h3><p>Cez túto prácu bude Team Lead prichádzať do priameho kontaktu s inštitúciami ako Kancelárie Kreatívnej Európy, úradníci európskej agentúry EACEA, Audiovizuálny fond, Fond na podporu umenia či medzinárodné nadácie. Po roku tak získa sieť funkčných pracovných kontaktov v Bruseli, Tallinne, Bratislave a Berlíne, ktorú je inou cestou v ranej fáze kariéry veľmi ťažké vybudovať.</p></div>
-    <div class="card"><span class="num">07</span><h3>Preukázateľné výsledky do životopisu</h3><p>Pozícia prinesie merateľné úspechy do profesijnej histórie — presný počet pripravených žiadostí, objem získaného financovania a reálnu prax s prestížnymi programami (Kreatívna Európa, Erasmus+, Horizont Európa). Vedenie 10-členného tímu na takýchto projektoch Team Leada okamžite odlíši od rovesníkov na trhu práce.</p></div>
-    <div class="card"><span class="num">08</span><h3>Priateľský a ambiciózny kolektív</h3><p>Pozícia znamená stať sa súčasťou tímu mladých profesionálov. V štúdiu vládne neformálna atmosféra, otvorená komunikácia a ochota pomôcť. Rovnako dôležitá je aj kultúra spoločných úspechov, kde sa vie tím po náročnom období sústrediť na oslavu dokončených projektov a získaných grantov.</p></div>
+    <div class="card"><span class="num">06</span><h3>Preukázateľné výsledky do životopisu</h3><p>Pozícia prinesie merateľné úspechy do profesijnej histórie - presný počet pripravených žiadostí, objem získaného financovania a reálnu prax s prestížnymi programami (Kreatívna Európa, Erasmus+, Horizont Európa). Vedenie 10-členného tímu na takýchto projektoch Team Leada odlíši od rovesníkov na trhu práce.</p></div>
+    <div class="card"><span class="num">07</span><h3>Priateľský a ambiciózny kolektív</h3><p>V štúdiu vládne neformálna atmosféra, otvorená komunikácia a ochota pomôcť. Rovnako dôležitá je aj kultúra spoločných úspechov, kde sa vie tím po náročnom období sústrediť na oslavu dokončených projektov a získaných grantov.</p></div>
   </div>
 </article>
 
 <!-- ============== PODMIENKY / HODNOTENIE ============== -->
-<article class="page" data-page="podmienky/hodnotenie">
+<article class="page" data-page="podmienky/hodnotenie" style="--bg:#e0e5f2;--accent:#7d95ff;--text:#0a0a0a">
   <div class="kicker"><span>Podmienky</span><span class="num">· Hodnotenie</span></div>
-  <h1 class="page-title">Otvorený<br>pracovný <em>rozhovor</em>.</h1>
-  <p class="lede">Pozícia Grant Team Leada je primárne dizajnovaná ako prvý krok dlhodobej spolupráce, nie ako jednorazové 12-mesačné angažmán. Z tohto dôvodu spolupráca zahŕňa štruktúrované hodnotiace rituály, ktoré umožňujú obom stranám priebežne overovať, či má spolupráca zmysel a v akej forme. Hodnotenie nie je formálny HR audit — je to otvorený pracovný rozhovor medzi Team Leadom a kreatívnym riaditeľom, zameraný na pomenovanie silných stránok, priestoru na rast a kalibráciu ďalšieho smerovania.</p>
+  <h1 class="page-title">Hodnotenie.</h1>
+  <p class="lede">Pozícia Grant Team Leada je primárne dizajnovaná ako prvý krok dlhodobej spolupráce, nie ako jednorazové 12-mesačné angažmán. Z tohto dôvodu spolupráca zahŕňa štruktúrované hodnotiace rituály, ktoré umožňujú obom stranám priebežne overovať, či má spolupráca zmysel a v akej forme. Hodnotenie nie je formálny HR audit - je to otvorený pracovný rozhovor medzi Team Leadom a kreatívnym riaditeľom, zameraný na pomenovanie silných stránok, priestoru na rast a kalibráciu ďalšieho smerovania.</p>
 
   <div class="timeline">
     <div class="timeline-item">
       <div class="ts">M1 · Po prvom mesiaci</div>
       <h3>Binárna otázka</h3>
-      <p>Prvý míľnik uzatvára skúšobný mesiac spolupráce. Otázka je jednoduchá: má spolupráca zmysel pre obe strany? Pozerá sa na prvý dojem z pracovnej dynamiky, fit medzi pracovnými štýlmi, schopnosť Team Leada navigovať špecifický kontext štúdia a jeho AI-first metodiku. Ak obe strany potvrdia záujem pokračovať, spolupráca plynule prechádza do plnej fázy. Ak nie, ukončuje sa čisto, bez ďalších záväzkov.</p>
+      <p>Prvý míľnik uzatvára skúšobný mesiac spolupráce. Otázka je jednoduchá: má spolupráca zmysel pre obe strany? Pozerá sa na prvý dojem z pracovnej dynamiky, fit medzi pracovnými štýlmi, schopnosť Team Leada navigovať špecifický kontext štúdia a jeho AI-first metodiku. Ak obe strany potvrdia záujem pokračovať, spolupráca plynule prechádza do plnej fázy. Ak nie, ukončuje sa čisto, vyplatením mesačnej odmeny, bez ďalších záväzkov.</p>
     </div>
     <div class="timeline-item">
       <div class="ts">M3 · Po troch mesiacoch</div>
@@ -789,108 +583,61 @@ details[open] .faq-q .qmark{transform:rotate(45deg)}
     <div class="timeline-item">
       <div class="ts">M6 · Po šiestich mesiacoch</div>
       <h3>Hlavný míľnik</h3>
-      <p>Tretí a kľúčový míľnik hodnotí celú prvú polovicu spolupráce — počet pripravených a podaných žiadostí v tíme, kvalitu reviews, schopnosť strategicky prerozdeľovať prácu medzi autorov, kvalitu komunikácie s administrátormi a konzorciálnymi partnermi, a prínos k optimalizácii AI workflow systémov štúdia.</p>
+      <p>Tretí a kľúčový míľnik hodnotí celú prvú polovicu spolupráce - počet pripravených a podaných žiadostí v tíme, kvalitu reviews, schopnosť strategicky prerozdeľovať prácu medzi autorov, kvalitu komunikácie s administrátormi a konzorciálnymi partnermi, a prínos k optimalizácii AI workflow systémov štúdia.</p>
     </div>
     <div class="timeline-item">
       <div class="ts">M12 · Záverečné hodnotenie</div>
       <h3>Otvára otázku dlhodobej spolupráce</h3>
-      <p>Štvrtý míľnik uzatvára prvý rok a otvára otázku formy ďalšej spolupráce — pokračovanie v rovnakej role s rozšíreným mandátom, posun do pozície Development Producer, alebo iné formy zapojenia.</p>
+      <p>Štvrtý míľnik uzatvára prvý rok a otvára otázku formy ďalšej spolupráce - pokračovanie v rovnakej role s rozšíreným mandátom, posun do pozície Development Producer, alebo iné formy zapojenia.</p>
     </div>
   </div>
 
   <h2>Štyri praktické vrstvy hodnotenia</h2>
-  <p>Hodnotenie sa pozerá na štyri praktické vrstvy: operatívna spoľahlivosť (deadliny, presnosť, ovládanie systémov, riadenie tímu), kvalita výstupov (úroveň reviews, komunikácia s donormi, angličtina), strategická orientácia (schopnosť kvalifikovať výzvy, navrhovať prioritizáciu, chápať kontext projektov), a soft skills (proaktivita, diskrétnosť, schopnosť pracovať s tímom aj samostatne, etika pri použití AI). Okrem soft KPIs sa zohľadňujú aj merateľné výsledky — počet pripravených žiadostí v tíme, hodnota reálne vyplateného financovania a kvalita evergreen dokumentácie, ktorá zostáva hodnotná pre nasledujúce roky.</p>
+  <p>Hodnotenie sa pozerá na štyri praktické vrstvy: operatívna spoľahlivosť (deadliny, presnosť, ovládanie systémov, riadenie tímu), kvalita výstupov (úroveň reviews, komunikácia s donormi, angličtina), strategická orientácia (schopnosť kvalifikovať výzvy, navrhovať prioritizáciu, chápať kontext projektov), a soft skills (proaktivita, diskrétnosť, schopnosť pracovať s tímom aj samostatne, etika pri použití AI). Okrem soft KPIs sa zohľadňujú aj merateľné výsledky - počet pripravených žiadostí v tíme, hodnota reálne vyplateného financovania a kvalita evergreen dokumentácie, ktorá zostáva hodnotná pre nasledujúce roky.</p>
 
   <h2>Ďalšie cesty po prvom roku</h2>
-  <p>Pri úspešnom prvom roku existujú tri prirodzené cesty. Najpriamejšia je posun do plnohodnotnej pozície Funding Coordinator alebo Development Producer, kde sa Team Lead stáva interným expertom pre celú medzinárodnú grantovú agendu štúdia. Druhou možnosťou je špecializovaná part-time spolupráca popri ďalších profesionálnych aktivitách alebo doktorandskom štúdiu — pre tých, ktorí chcú paralelne rozvíjať kariéru v inej oblasti, ale zostať napojení na grantovú prácu ako externý expert. Treťou možnosťou je odporúčanie do širšieho ekosystému — Smatana aktívne spolupracuje s inými inštitúciami a Team Lead s preukázanými výsledkami má reálnu šancu na umiestnenie v EU inštitúciách, špecializovaných agentúrach alebo iných európskych kreatívnych štúdiách.</p>
+  <p>Pri úspešnom prvom roku existujú tri prirodzené cesty. Najpriamejšia je posun do plnohodnotnej pozície Funding Coordinator alebo Development Producer, kde sa Team Lead stáva interným expertom pre celú medzinárodnú grantovú agendu štúdia. Druhou možnosťou je špecializovaná part-time spolupráca popri ďalších profesionálnych aktivitách alebo doktorandskom štúdiu - pre tých, ktorí chcú paralelne rozvíjať kariéru v inej oblasti, ale zostať napojení na grantovú prácu ako externý expert. Treťou možnosťou je odporúčanie do širšieho ekosystému - Smatana aktívne spolupracuje s inými inštitúciami a Team Lead s preukázanými výsledkami má reálnu šancu na umiestnenie v EU inštitúciách, špecializovaných agentúrach alebo iných európskych kreatívnych štúdiách.</p>
 
   <h2>Certifikát a referencia</h2>
-  <p>Bez ohľadu na to, ktorú z týchto ciest Team Lead po prvom roku zvolí, dostáva oficiálny certifikát o 12-mesačnom pôsobení v role (v slovenskej aj anglickej verzii) a osobnú referenciu od kreatívneho riaditeľa, ktorá uvádza konkrétne výsledky — počet pripravených žiadostí v tíme, hodnotu kontrahovaného financovania, kľúčové programy a inštitúcie, s ktorými spolupracoval, a rozvinuté kompetencie. Tento balík je dizajnovaný tak, aby bol okamžite použiteľný pri uchádzaní sa o pozície v EU inštitúciách, špecializovaných agentúrach alebo iných európskych kreatívnych štúdiách.</p>
+  <p>Bez ohľadu na to, ktorú z týchto ciest Team Lead po prvom roku zvolí, dostáva oficiálny certifikát o 12-mesačnom pôsobení v role (v slovenskej aj anglickej verzii) a osobnú referenciu od kreatívneho riaditeľa, ktorá uvádza konkrétne výsledky - počet pripravených žiadostí v tíme, hodnotu kontrahovaného financovania, kľúčové programy a inštitúcie, s ktorými spolupracoval, a rozvinuté kompetencie. Tento balík je dizajnovaný tak, aby bol použiteľný pri uchádzaní sa o pozície v EU inštitúciách, špecializovaných agentúrach alebo iných európskych kreatívnych štúdiách.</p>
 </article>
 
-<!-- ============== FAQ ============== -->
-<article class="page" data-page="faq/index">
-  <div class="kicker"><span>FAQ</span><span class="num">· Často kladené otázky</span></div>
-  <h1 class="page-title">Často kladené<br><em>otázky</em>.</h1>
-
-  <details class="faq-item"><summary class="faq-q">Dá sa táto práca skĺbiť s doktorandským štúdiom alebo inými projektmi?<span class="qmark">+</span></summary><div class="faq-a">Áno. Hoci rozsah úloh zodpovedá plnému úväzku (približne 35–40 hodín týždenne), pozícia ponúka vysokú časovú flexibilitu. Prácu je možné rozložiť a zladiť s akademickými povinnosťami alebo vedeckou činnosťou. Pevne stanovené sú len týždenné koordinácie s kreatívnym riaditeľom a mesačné strategické stretnutia. Zvyšok agendy sa rieši asynchrónne podľa vlastných možností a uváženia.</div></details>
-
-  <details class="faq-item"><summary class="faq-q">Je možné vykonávať túto rolu zo zahraničia alebo počas výskumného pobytu?<span class="qmark">+</span></summary><div class="faq-a">Áno. Celá spolupráca prebieha na diaľku. Štúdio bežne funguje s tímom spolupracovníkov po celej Európe. Ak vedúci tímu zmení miesto pobytu alebo odíde na zahraničnú rezidenciu, práca pokračuje bez prerušenia online formou. Prípadnú administratívu spojenú s tlačením a fyzickým odosielaním dokumentov pre slovenské fondy operatívne doriešia ostatní kolegovia priamo na Slovensku.</div></details>
-
-  <details class="faq-item"><summary class="faq-q">Čo ak po prvých mesiacoch zistíme, že nám spolupráca nevyhovuje?<span class="qmark">+</span></summary><div class="faq-a">Spolupráca má jasne nastavené priebežné míľniky. Prvý mesiac funguje ako skúšobné obdobie, kedy si obe strany otvorene povedia, či im nastavená dynamika vyhovuje. Ak sa ukáže, že to nie je ideálne spojenie, spolupráca sa ukončí priamo a korektne, bez akýchkoľvek negatívnych dôsledkov.</div></details>
-
-  <details class="faq-item"><summary class="faq-q">Čo ak sa počas 12 mesiacov neschváli žiadny grant?<span class="qmark">+</span></summary><div class="faq-a">Úspešnosť európskych aj národných programov sa reálne pohybuje medzi 15 % až 35 %. Môže sa stať, že aj výborne pripravený projekt komisia zamietne pre vonkajšie faktory, ktoré nevieme ovplyvniť (aktuálna konkurencia v danom roku či politické priority fondu). Na rozdiel od stážistov má však vedúci tímu finančné zázemie v podobe pevnej mesačnej odmeny. Tá riadne pokrýva jeho každodennú manažérsku prácu a riadenie tímu bez ohľadu na okamžitý dotačný výsledok.</div></details>
-
-  <details class="faq-item"><summary class="faq-q">Aká je reálna perspektíva pokračovania po prvom roku?<span class="qmark">+</span></summary><div class="faq-a">Naším cieľom nie je krátkodobá výpomoc, ale hľadanie kolegu na dlhé obdobie. Po úspešnom prvom roku a stabilizácii procesov sa otvárajú možnosti prechodu na pozíciu hlavného koordinátora financovania alebo vývojového producenta štúdia, prípadne na formu špecializovanej expertízy prispôsobenej aktuálnej životnej a vedeckej situácii daného človeka.</div></details>
-
-  <details class="faq-item"><summary class="faq-q">Je nutné dopredu ovládať všetky systémy a grantové portály?<span class="qmark">+</span></summary><div class="faq-a">Predchádzajúca skúsenosť s grantovou agendou a vedením ľudí je veľkou výhodou, no dôležitejšia je schopnosť rýchlo sa zorientovať a pracovať systematicky. Počas úvodných dvoch týždňov prebehne podrobné predstavenie všetkých interných systémov a softvérového vybavenia. Pri prvých podaniach do zložitejších portálov je navyše vždy k dispozícii osobná podpora kreatívneho riaditeľa alebo externého konzultanta.</div></details>
-
-  <details class="faq-item"><summary class="faq-q">Ako sa pristupuje k využívaniu umelej inteligencie?<span class="qmark">+</span></summary><div class="faq-a">Umelá inteligencia slúži ako užitočný pomocník na rutinné, vyhľadávacie a analytické úkony, nie ako náhrada ľudského úsudku. Pomer medzi automatizovanou pomocou a samostatnou prácou si vedúci tímu koriguje sám podľa povahy úlohy. Zodpovednosť za finálnu kvalitu, overenie faktov a overenie logiky textov však vždy zostáva na človeku.</div></details>
-
-  <details class="faq-item"><summary class="faq-q">Ako štúdio rieši voľno, prázdniny alebo skúškové obdobia?<span class="qmark">+</span></summary><div class="faq-a">Všetko stojí na včasnej dohode a vzájomnom plánovaní. Pred plánovaným voľnom alebo náročným obdobím v škole stačí s predstihom informovať kreatívneho riaditeľa. Ak sa termín voľna kríži s dôležitou uzávierkou grantu, úlohy sa prerozdelia alebo ich dočasne pokryje vedenie štúdia s externým konzultantom. Mimo kritických termínov je plánovanie času plne v rukách vedúceho tímu.</div></details>
-
-  <details class="faq-item"><summary class="faq-q">Čo sa stane, ak vedúci tímu urobí chybu, ktorá ohrozí žiadosť?<span class="qmark">+</span></summary><div class="faq-a">Chyby sú prirodzenou súčasťou práce a náš systém je nastavený tak, aby ich zachytil včas. Každá žiadosť prechádza viacstupňovou kontrolou — od prvého návrhu stážistu cez revíziu vedúceho tímu, kontrolu asistentom umelej inteligencie až po záverečné schválenie kreatívnym riaditeľom. Finálnu zodpovednosť za odoslanie nikdy nenesie vedúci tímu sám. Ak napriek tomu dôjde k formálnemu zamietnutiu, situáciu spoločne v pokoji zanalyzujeme, upravíme procesy a pokračujeme ďalej.</div></details>
-</article>
-
-<footer class="stage-footer"><span>Smatana · Vedúci grantového tímu</span><span>2026</span></footer>
+<footer class="stage-footer"><span>smatana · vedúci grantového tímu</span><a href="mailto:hello@smatana.com" style="color:inherit;text-decoration:none;border-bottom:1px solid currentColor">hello@smatana.com</a><span>2026</span></footer>
 </main>
 
 <script>
-/* ============ STARS ============ */
+/* ============ CURSOR - compactino style (mix-blend-mode difference) ============ */
 (()=>{
-  const g=document.getElementById('starsGroup');if(!g)return;
-  const N=12,R=72;
-  for(let i=0;i<N;i++){
-    const a=(i/N)*Math.PI*2-Math.PI/2;
-    const x=Math.cos(a)*R,y=Math.sin(a)*R;
-    const s=document.createElementNS('http://www.w3.org/2000/svg','path');
-    s.setAttribute('d','M0 -8 L2 -2 L8 -2 L3 2 L5 8 L0 4 L-5 8 L-3 2 L-8 -2 L-2 -2 Z');
-    s.setAttribute('fill','#FFCC00');s.setAttribute('transform',`translate(${x},${y})`);
-    g.appendChild(s);
-  }
-})();
-
-/* ============ CURSOR ============ */
-(()=>{
-  const dot=document.querySelector('.cursor-dot'),ring=document.querySelector('.cursor-ring');
-  if(!dot||!matchMedia('(hover:hover)').matches)return;
+  const c=document.getElementById('cursor'),d=document.getElementById('cursorDot');
+  if(!c||!matchMedia('(hover:hover)').matches)return;
   let mx=0,my=0,rx=0,ry=0;
-  window.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.transform=`translate(${mx}px,${my}px) translate(-50%,-50%)`;});
-  function loop(){rx+=(mx-rx)*0.18;ry+=(my-ry)*0.18;ring.style.transform=`translate(${rx}px,${ry}px) translate(-50%,-50%)`;requestAnimationFrame(loop);}loop();
-  document.addEventListener('mouseover',e=>{if(e.target.closest('a,button,summary,.card,.seal,.preset-chip,.faq-q,.dropdown-item'))ring.classList.add('is-hover');});
-  document.addEventListener('mouseout',e=>{if(e.target.closest('a,button,summary,.card,.seal,.preset-chip,.faq-q,.dropdown-item'))ring.classList.remove('is-hover');});
+  window.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;d.style.transform=`translate(${mx}px,${my}px) translate(-50%,-50%)`;});
+  function loop(){rx+=(mx-rx)*0.18;ry+=(my-ry)*0.18;c.style.transform=`translate(${rx}px,${ry}px) translate(-50%,-50%)`;requestAnimationFrame(loop);}loop();
+  document.addEventListener('mouseover',e=>{if(e.target.closest('a,button,summary,.card,.seal,.faq-q,.dropdown-item,.hero-tag'))c.classList.add('is-hover');});
+  document.addEventListener('mouseout',e=>{if(e.target.closest('a,button,summary,.card,.seal,.faq-q,.dropdown-item,.hero-tag'))c.classList.remove('is-hover');});
 })();
 
-/* ============ THREE.JS SHADER ============ */
+/* ============ SCROLL PROGRESS ============ */
 (()=>{
-  if(!window.THREE)return;
-  const canvas=document.getElementById('shaderBg');if(!canvas)return;
-  const renderer=new THREE.WebGLRenderer({canvas,antialias:false,alpha:true});
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio,1.5));
-  renderer.setSize(innerWidth,innerHeight);
-  const scene=new THREE.Scene(),camera=new THREE.Camera();
-  const uniforms={iTime:{value:0},iRes:{value:new THREE.Vector2(innerWidth,innerHeight)},iMouse:{value:new THREE.Vector2(0.5,0.5)}};
-  const mat=new THREE.ShaderMaterial({uniforms,
-    vertexShader:`void main(){gl_Position=vec4(position,1.0);}`,
-    fragmentShader:`precision highp float;uniform float iTime;uniform vec2 iRes;uniform vec2 iMouse;
-      float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-      float noise(vec2 p){vec2 i=floor(p),f=fract(p);float a=hash(i),b=hash(i+vec2(1,0)),c=hash(i+vec2(0,1)),d=hash(i+vec2(1,1));vec2 u=f*f*(3.0-2.0*f);return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}
-      float fbm(vec2 p){float v=0.0,a=0.5;for(int i=0;i<5;i++){v+=a*noise(p);p*=2.0;a*=0.5;}return v;}
-      void main(){vec2 uv=(gl_FragCoord.xy-0.5*iRes)/min(iRes.x,iRes.y);float t=iTime*0.04;
-        vec2 q=vec2(fbm(uv+t),fbm(uv+vec2(1.7,9.2)+t));
-        float n=fbm(uv*1.2+q*1.4+t);
-        vec3 c1=vec3(0.000,0.071,0.262),c2=vec3(0.000,0.165,0.478),c3=vec3(1.000,0.800,0.000);
-        vec3 col=mix(c1,c2,smoothstep(0.2,0.8,n));
-        col=mix(col,c3,smoothstep(0.7,0.95,n)*0.14);
-        vec2 m=(iMouse-0.5)*vec2(iRes.x/iRes.y,1.0)*2.0;
-        float d=distance(uv,m);float glow=exp(-d*2.4)*0.16;
-        col+=vec3(glow*0.6,glow*0.7,glow*0.2);
-        gl_FragColor=vec4(col,1.0);}`});
-  scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),mat));
-  window.addEventListener('mousemove',e=>uniforms.iMouse.value.set(e.clientX/innerWidth,1-e.clientY/innerHeight));
-  window.addEventListener('resize',()=>{renderer.setSize(innerWidth,innerHeight);uniforms.iRes.value.set(innerWidth,innerHeight);});
-  function tick(t){uniforms.iTime.value=t*0.001;renderer.render(scene,camera);requestAnimationFrame(tick);}tick(0);
+  const bar=document.getElementById('scrollProgress');if(!bar)return;
+  function update(){
+    const h=document.documentElement.scrollHeight-window.innerHeight;
+    const p=h>0?(window.scrollY/h)*100:0;
+    bar.style.width=p+'%';
+  }
+  window.addEventListener('scroll',update,{passive:true});
+  window.addEventListener('resize',update);
+  update();
 })();
+
+/* ============ SYNC body bg with active page ============ */
+function syncBodyBg(){
+  const active=document.querySelector('.page.is-active');
+  if(!active)return;
+  const cs=getComputedStyle(active);
+  const bg=cs.getPropertyValue('--bg').trim()||'#f6f4ee';
+  document.body.style.backgroundColor=bg;
+}
 
 /* ============ LENIS ============ */
 let lenis=null;
@@ -901,15 +648,13 @@ if(window.Lenis&&matchMedia('(hover:hover)').matches){
 
 /* ============ ROUTING ============ */
 const sections={
-  stuudio:['kto-sme','pravne-subjekty','preco-granty','sance'],
-  pozicia:['predstavenie','profil','naplna','po-schvaleni'],
-  podmienky:['odmena','benefity','hodnotenie'],
-  systemy:['nastroje','ai','ekosystem'],
-  faq:['index']
+  stuudio:['kto-sme','preco-granty'],
+  naplna:['predstavenie','riadenie','ziadosti','systemy-ai','realizacia','hranice'],
+  podmienky:['profil','odmena','benefity','hodnotenie']
 };
 const navTabs=document.querySelectorAll('.nav-tab');
 const dropdownItems=document.querySelectorAll('.dropdown-item');
-let currentSection='pozicia',currentSlug='predstavenie';
+let currentSection='naplna',currentSlug='predstavenie';
 
 function setActive(section,slug){
   navTabs.forEach(t=>t.classList.toggle('is-active',t.dataset.section===section));
@@ -923,6 +668,7 @@ function fadeOutCurrent(cb){
 function fadeInTarget(target){
   if(!target)return;
   target.classList.add('is-active');
+  syncBodyBg();
   if(window.gsap){
     gsap.fromTo(target,{opacity:0,y:18},{opacity:1,y:0,duration:0.7,ease:'power3.out'});
     const ch=target.querySelectorAll('.page-title,.lede,.kicker,h2,h3,p,.card,.seal,.timeline-item,.faq-item,.callout,ul.bullet li,ol.bullet li,.paper,.data-table');
@@ -951,7 +697,7 @@ navTabs.forEach(t=>{
   });
 });
 dropdownItems.forEach(d=>{d.addEventListener('click',()=>goTo(d.dataset.section,d.dataset.slug));});
-document.getElementById('brandLink')?.addEventListener('click',e=>{e.preventDefault();goTo('pozicia','predstavenie');});
+document.getElementById('brandLink')?.addEventListener('click',e=>{e.preventDefault();goTo('naplna','predstavenie');});
 
 function bootRoute(){
   const hash=location.hash.slice(1);
